@@ -14,10 +14,9 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
+  id            String         @id @map("id")
   username      String         @unique
   email         String         @unique
-  password      String
   questions     Question[]
   answers       Answer[]
   votes         AnswerVote[]

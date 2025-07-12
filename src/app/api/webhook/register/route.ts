@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { WebhookEvent, clerkClient } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
@@ -36,12 +36,8 @@ export async function POST(req: Request) {
   }
 
   if (evt.type === "user.created") {
-    const {
-      id,
-      username,
-      email_addresses,
-      primary_email_address_id,
-    } = evt.data;
+    const { id, username, email_addresses, primary_email_address_id } =
+      evt.data;
 
     const primaryEmail = email_addresses.find(
       (email) => email.id === primary_email_address_id
@@ -52,28 +48,35 @@ export async function POST(req: Request) {
     }
 
     try {
+      // OPTIONAL: Fetch user data from Clerk (if you want to verify it exists)
+      const client = clerkClient();
+      (await client).users.getUser(id);
+
       const existingUser = await prisma.user.findUnique({
-        where: {
-          id,
-        },
+        where: { id },
       });
 
       if (!existingUser) {
+        const usernameToSave =
+          username ?? primaryEmail.email_address.split("@")[0];
+
         const newUser = await prisma.user.create({
           data: {
-            id: id,
-            username: username ?? "",
+            id,
+            username: usernameToSave,
             email: primaryEmail.email_address,
-            password: "external-auth",
           },
         });
+
         console.log("New user created in DB:", newUser);
       }
     } catch (error) {
       console.error("Error creating user in DB or syncing metadata", error);
       return new Response("Error handling user.created", { status: 500 });
     }
+
     return new Response("User processed successfully", { status: 200 });
   }
+
   return new Response("Event type not handled", { status: 200 });
 }
