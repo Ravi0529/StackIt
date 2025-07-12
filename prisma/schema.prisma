@@ -38,7 +38,7 @@ model Question {
   user             User     @relation(fields: [userId], references: [id])
   tags             Tag[]    @relation("QuestionTags")
   answers          Answer[] @relation("AnswerToQuestion")
-  acceptedAnswerId String?
+  acceptedAnswerId String?  @unique
   acceptedAnswer   Answer?  @relation("AcceptedAnswer", fields: [acceptedAnswerId], references: [id])
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -54,7 +54,7 @@ model Answer {
   votes      AnswerVote[]
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  Question   Question[]   @relation("AcceptedAnswer")
+  Question   Question?    @relation("AcceptedAnswer")
 }
 
 model Tag {
