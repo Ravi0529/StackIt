@@ -17,17 +17,11 @@ model User {
   id            String         @id @default(cuid())
   username      String         @unique
   email         String         @unique
-  passwordHash  String
-  role          Role           @default(USER)
+  password      String
   questions     Question[]
   answers       Answer[]
   votes         AnswerVote[]
   notifications Notification[]
-}
-
-enum Role {
-  USER
-  ADMIN
 }
 
 model Question {
