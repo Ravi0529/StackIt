@@ -1,75 +1,87 @@
-'use client'
+"use client";
 
-import { useSession, signOut } from 'next-auth/react'
-import { useRouter } from "next/navigation"
-import { useState } from 'react'
+import { useUser, useClerk } from "@clerk/nextjs";
+import Link from "next/link";
+import { LogOut, CreditCard } from "lucide-react";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-export default function Navbar() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleSignOut = async () => {
-    setIsLoading(true)
-    try {
-      await signOut({ callbackUrl: '/' })
-    } catch (error) {
-      console.error('Sign out error:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleLogin = () => {
-    router.push('/auth/signin')
-  }
+const Navbar = () => {
+  const { user } = useUser();
+  const { signOut } = useClerk();
 
   return (
-    <header className="bg-gray-900 border-b border-gray-800">
+    <nav className="sticky top-0 z-30 w-full bg-background/80 backdrop-blur border-b shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-white">StackIt</h1>
-            <span className="ml-2 text-sm text-gray-400">Task Management</span>
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 group select-none"
+          >
+            <span className="text-2xl font-abold text-black tracking-tight transition-colors group-hover:text-primary">
+              StackIt
+            </span>
+          </Link>
+          <div className="flex items-center gap-3">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full p-0 border-2 border-muted-foreground/20 hover:border-primary/60 transition-shadow focus-visible:ring-2 focus-visible:ring-primary/40"
+                  >
+                    <Avatar>
+                      <AvatarImage src={user.imageUrl} alt="User avatar" />
+                      <AvatarFallback>
+                        {user.firstName?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="flex items-center">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button
+                  variant="default"
+                  asChild
+                  size="lg"
+                  className="px-5 font-semibold"
+                >
+                  <Link href="/signin">Sign In</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  asChild
+                  size="lg"
+                  className="px-5 font-semibold"
+                >
+                  <Link href="/signup">Sign Up</Link>
+                </Button>
+              </>
+            )}
           </div>
-          
-          {status === 'loading' ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
-            </div>
-          ) : session ? (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                {session.user?.image && (
-                  <img
-                    src={session.user.image}
-                    alt={session.user.name || 'User'}
-                    className="w-8 h-8 rounded-full"
-                  />
-                )}
-                <span className="text-sm font-medium text-gray-300 hidden sm:block">
-                  {session.user?.name || session.user?.email}
-                </span>
-              </div>
-              <button
-                onClick={handleSignOut}
-                disabled={isLoading}
-                className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? '...' : 'Sign Out'}
-              </button>
-            </div>
-          ) : (
-            <button 
-              onClick={handleLogin}
-              className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Login
-            </button>
-          )}
         </div>
       </div>
-    </header>
-  )
-}
-    
+    </nav>
+  );
+};
+
+export default Navbar;
