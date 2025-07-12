@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  email         String         @unique
+  passwordHash  String
+  role          Role           @default(USER)
+  questions     Question[]
+  answers       Answer[]
+  votes         AnswerVote[]
+  notifications Notification[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Question {
+  id               String   @id @default(cuid())
+  title            String
+  description      String
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  tags             Tag[]    @relation("QuestionTags")
+  answers          Answer[] @relation("AnswerToQuestion")
+  acceptedAnswerId String?
+  acceptedAnswer   Answer?  @relation("AcceptedAnswer", fields: [acceptedAnswerId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Answer {
+  id         String       @id @default(cuid())
+  content    String
+  questionId String
+  question   Question     @relation("AnswerToQuestion", fields: [questionId], references: [id])
+  userId     String
+  user       User         @relation(fields: [userId], references: [id])
+  votes      AnswerVote[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Question   Question[]   @relation("AcceptedAnswer")
+}
+
+model Tag {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  questions Question[] @relation("QuestionTags")
+}
+
+model AnswerVote {
+  id       String @id @default(cuid())
+  value    Int
+  userId   String
+  answerId String
+  user     User   @relation(fields: [userId], references: [id])
+  answer   Answer @relation(fields: [answerId], references: [id])
+
+  @@unique([userId, answerId]) // A user can vote only once per answer
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
