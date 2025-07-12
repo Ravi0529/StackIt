@@ -31,12 +31,12 @@ enum Role {
 }
 
 model Question {
-  id               String   @id @default(cuid())
+  id               String   @id @default(uuid())
   title            String
   description      String
   userId           String
   user             User     @relation(fields: [userId], references: [id])
-  tags             Tag[]    @relation("QuestionTags")
+  tags             Tag[]   @relation("QuestionTags")
   answers          Answer[] @relation("AnswerToQuestion")
   acceptedAnswerId String?  @unique
   acceptedAnswer   Answer?  @relation("AcceptedAnswer", fields: [acceptedAnswerId], references: [id])
@@ -45,7 +45,7 @@ model Question {
 }
 
 model Answer {
-  id         String       @id @default(cuid())
+  id         String       @id @default(uuid())
   content    String
   questionId String
   question   Question     @relation("AnswerToQuestion", fields: [questionId], references: [id])
@@ -58,13 +58,13 @@ model Answer {
 }
 
 model Tag {
-  id        String     @id @default(cuid())
+  id        String     @id @default(uuid())
   name      String     @unique
   questions Question[] @relation("QuestionTags")
 }
 
 model AnswerVote {
-  id       String @id @default(cuid())
+  id       String @id @default(uuid ())
   value    Int
   userId   String
   answerId String
@@ -75,7 +75,7 @@ model AnswerVote {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   message   String

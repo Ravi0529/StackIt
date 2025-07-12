@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.24.0",
     "@prisma/client": "6.11.1",
     "next": "15.3.5",
     "next-auth": "^4.24.11",
