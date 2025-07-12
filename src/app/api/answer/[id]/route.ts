@@ -79,6 +79,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         } else {
             // Like (add vote)
             await prisma.answerVote.create({ data: { userId, answerId, value: 1 } });
+            // Notify the answer's author
+            const answer = await prisma.answer.findUnique({ where: { id: answerId } });
+            if (answer && answer.userId !== userId) {
+                await prisma.notification.create({
+                    data: {
+                        userId: answer.userId,
+                        message: `Your answer received a like!`,
+                    },
+                });
+            }
             return NextResponse.json({ success: true, liked: true });
         }
     } catch (error) {
