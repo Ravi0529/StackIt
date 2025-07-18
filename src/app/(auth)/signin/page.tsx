@@ -153,7 +153,7 @@ export default function SignInPage() {
           <CardFooter className="flex flex-col gap-2 mt-5">
             <Button
               type="submit"
-              className="w-full bg-zinc-100 text-black font-semibold hover:bg-zinc-200 py-5 mt-2 border border-[#444] transition-colors duration-200 shadow-sm text-md"
+              className="w-fit py-5 bg-zinc-100 text-black font-semibold hover:bg-zinc-200 mt-2 border border-[#444] transition-colors duration-200 shadow-sm text-md"
               disabled={loading}
             >
               {loading ? <Loader2 className="animate-spin mr-2" /> : ""}
