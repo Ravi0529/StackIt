@@ -15,18 +15,17 @@ import { User } from "@prisma/client";
 
 const Navbar = () => {
   const { data: session } = useSession();
-
   const user: User = session?.user as User;
 
   return (
-    <nav className="sticky top-0 z-30 w-full bg-background/80 backdrop-blur border-b shadow-sm">
+    <nav className="sticky top-0 z-30 w-full bg-[#0f0f11] border-b border-[#2a2a36] shadow-md font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link
             href="/feed"
             className="flex items-center gap-2 group select-none"
           >
-            <span className="text-2xl font-abold text-black tracking-tight transition-colors group-hover:text-primary">
+            <span className="text-2xl font-extrabold tracking-tight text-white font-serif">
               StackIt
             </span>
           </Link>
@@ -36,14 +35,14 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-10 w-10 rounded-full p-0 border-2 border-muted-foreground/20 hover:border-primary/60 transition-shadow focus-visible:ring-2 focus-visible:ring-primary/40"
+                    className="relative h-10 w-10 rounded-full p-0 border border-[#3a3a47] hover:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1] transition"
                   >
-                    <Avatar>
+                    <Avatar className="h-9 w-9">
                       <AvatarImage
                         src={(user as any)?.image || undefined}
                         alt={user?.username || user?.email || "User"}
                       />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-[#1f1f29] text-white">
                         {user?.username?.[0]?.toUpperCase() ||
                           user?.email?.[0]?.toUpperCase() || (
                             <UserIcon className="h-5 w-5" />
@@ -52,38 +51,37 @@ const Navbar = () => {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent
+                  align="end"
+                  className="bg-[#1a1a22] border border-[#2e2e3e] rounded-md text-white shadow-lg"
+                >
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                    <Link
+                      href="/profile"
+                      className="flex items-center px-2 py-2 w-full hover:bg-[#2a2a36] rounded-sm transition"
+                    >
+                      <CreditCard className="mr-2 h-4 w-4 text-white" />
+                      <span className="font-medium">Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => signOut()}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign out</span>
+                  <DropdownMenuItem
+                    onClick={() => signOut()}
+                    className="text-red-500 hover:bg-red-900/40 transition rounded-sm"
+                  >
+                    <LogOut className="mr-2 h-4 w-4 text-red-500" />
+                    <span className="font-medium">Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <>
-                <Button
-                  variant="default"
-                  asChild
-                  size="lg"
-                  className="px-5 font-semibold"
-                >
-                  <Link href="/signin">Sign In</Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  asChild
-                  size="lg"
-                  className="px-5 font-semibold"
-                >
-                  <Link href="/signup">Sign Up</Link>
-                </Button>
-              </>
+              <Button
+                variant="default"
+                asChild
+                size="lg"
+                className="px-5 text-sm font-semibold bg-zinc-100 text-black hover:bg-zinc-200 transition font-mono"
+              >
+                <Link href="/signin">Login</Link>
+              </Button>
             )}
           </div>
         </div>
