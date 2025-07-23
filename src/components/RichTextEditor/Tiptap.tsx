@@ -2,6 +2,9 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Document from "@tiptap/extension-document";
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
 import Bold from "@tiptap/extension-bold";
 import Italic from "@tiptap/extension-italic";
 import Underline from "@tiptap/extension-underline";
@@ -10,6 +13,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { BulletList, ListItem, OrderedList } from "@tiptap/extension-list";
+import Heading from "@tiptap/extension-heading";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
@@ -17,11 +21,17 @@ import CodeBlockComponent from "./CodeBlockComponent";
 export default function Tiptap() {
   const editor = useEditor({
     extensions: [
+      Document,
+      Paragraph,
+      Text,
       StarterKit.configure({
         bold: false,
         italic: false,
         strike: false,
         codeBlock: false,
+        bulletList: false,
+        orderedList: false,
+        heading: false,
       }),
       Bold.configure({
         HTMLAttributes: { class: "my-custom-bold" },
@@ -34,6 +44,12 @@ export default function Tiptap() {
       }),
       Strike.configure({
         HTMLAttributes: { class: "my-custom-strike" },
+      }),
+      Heading.configure({
+        levels: [1, 2, 3],
+        HTMLAttributes: {
+          class: "my-custom-heading",
+        },
       }),
       Highlight.configure({
         multicolor: true,
@@ -67,7 +83,7 @@ export default function Tiptap() {
         HTMLAttributes: { class: "my-custom-list-item" },
       }),
     ],
-    content: "<p>Hello World! 🌎️</p>",
+    content: "<p>Add your description here</p>",
     immediatelyRender: false,
   });
 
@@ -112,6 +128,39 @@ export default function Tiptap() {
           }`}
         >
           Strike
+        </button>
+
+        <button
+          onClick={() => editor?.commands.toggleHeading({ level: 1 })}
+          className={`px-2 py-1 border rounded ${
+            editor?.isActive("heading", { level: 1 })
+              ? "bg-black text-white"
+              : "bg-white"
+          }`}
+        >
+          H1
+        </button>
+
+        <button
+          onClick={() => editor?.commands.toggleHeading({ level: 2 })}
+          className={`px-2 py-1 border rounded ${
+            editor?.isActive("heading", { level: 2 })
+              ? "bg-black text-white"
+              : "bg-white"
+          }`}
+        >
+          H2
+        </button>
+
+        <button
+          onClick={() => editor?.commands.toggleHeading({ level: 3 })}
+          className={`px-2 py-1 border rounded ${
+            editor?.isActive("heading", { level: 3 })
+              ? "bg-black text-white"
+              : "bg-white"
+          }`}
+        >
+          H3
         </button>
 
         <button
