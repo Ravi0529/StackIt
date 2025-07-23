@@ -20,6 +20,7 @@
     "@tiptap/extension-highlight": "^3.0.7",
     "@tiptap/extension-italic": "^3.0.7",
     "@tiptap/extension-link": "^3.0.7",
+    "@tiptap/extension-list": "^3.0.7",
     "@tiptap/extension-strike": "^3.0.7",
     "@tiptap/extension-underline": "^3.0.7",
     "@tiptap/pm": "^3.0.7",

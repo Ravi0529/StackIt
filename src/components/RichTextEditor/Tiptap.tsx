@@ -9,6 +9,7 @@ import Strike from "@tiptap/extension-strike";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { BulletList, ListItem, OrderedList } from "@tiptap/extension-list";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
@@ -56,10 +57,23 @@ export default function Tiptap() {
           return ReactNodeViewRenderer(CodeBlockComponent);
         },
       }),
+      BulletList.configure({
+        HTMLAttributes: { class: "list-disc pl-6" },
+      }),
+      OrderedList.configure({
+        HTMLAttributes: { class: "list-decimal pl-6" },
+      }),
+      ListItem.configure({
+        HTMLAttributes: { class: "my-custom-list-item" },
+      }),
     ],
     content: "<p>Hello World! 🌎️</p>",
     immediatelyRender: false,
   });
+
+  if (!editor) {
+    return <div>Loading editor...</div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -150,6 +164,24 @@ export default function Tiptap() {
           }`}
         >
           Code Block
+        </button>
+
+        <button
+          onClick={() => editor?.commands.toggleBulletList()}
+          className={`px-2 py-1 border rounded ${
+            editor?.isActive("bulletList") ? "bg-black text-white" : "bg-white"
+          }`}
+        >
+          Bullet List
+        </button>
+
+        <button
+          onClick={() => editor?.commands.toggleOrderedList()}
+          className={`px-2 py-1 border rounded ${
+            editor?.isActive("orderedList") ? "bg-black text-white" : "bg-white"
+          }`}
+        >
+          Ordered List
         </button>
       </div>
 
