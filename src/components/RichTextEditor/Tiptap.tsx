@@ -14,6 +14,7 @@ import Link from "@tiptap/extension-link";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { BulletList, ListItem, OrderedList } from "@tiptap/extension-list";
 import Heading from "@tiptap/extension-heading";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
@@ -32,6 +33,7 @@ export default function Tiptap() {
         bulletList: false,
         orderedList: false,
         heading: false,
+        horizontalRule: false,
       }),
       Bold.configure({
         HTMLAttributes: { class: "my-custom-bold" },
@@ -49,6 +51,11 @@ export default function Tiptap() {
         levels: [1, 2, 3],
         HTMLAttributes: {
           class: "my-custom-heading",
+        },
+      }),
+      HorizontalRule.configure({
+        HTMLAttributes: {
+          class: "my-custom-class",
         },
       }),
       Highlight.configure({
@@ -161,6 +168,13 @@ export default function Tiptap() {
           }`}
         >
           H3
+        </button>
+
+        <button
+          onClick={() => editor?.commands.setHorizontalRule()}
+          className="px-2 py-1 border rounded bg-white"
+        >
+          Horizontal Rule
         </button>
 
         <button
