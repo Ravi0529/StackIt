@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
@@ -15,11 +16,16 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { BulletList, ListItem, OrderedList } from "@tiptap/extension-list";
 import Heading from "@tiptap/extension-heading";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
 
 export default function Tiptap() {
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const editor = useEditor({
     extensions: [
       Document,
@@ -28,12 +34,14 @@ export default function Tiptap() {
       StarterKit.configure({
         bold: false,
         italic: false,
+        underline: false,
         strike: false,
         codeBlock: false,
         bulletList: false,
         orderedList: false,
         heading: false,
         horizontalRule: false,
+        link: false,
       }),
       Bold.configure({
         HTMLAttributes: { class: "my-custom-bold" },
@@ -56,6 +64,13 @@ export default function Tiptap() {
       HorizontalRule.configure({
         HTMLAttributes: {
           class: "my-custom-class",
+        },
+      }),
+      Emoji.configure({
+        emojis: gitHubEmojis,
+        enableEmoticons: true,
+        HTMLAttributes: {
+          class: "my-custom-emoji",
         },
       }),
       Highlight.configure({
@@ -99,7 +114,7 @@ export default function Tiptap() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative">
       <div className="toolbar flex flex-wrap gap-2">
         <button
           onClick={() => editor?.commands.toggleBold()}
@@ -178,6 +193,13 @@ export default function Tiptap() {
         </button>
 
         <button
+          onClick={() => setShowEmojiPicker((prev) => !prev)}
+          className="px-2 py-1 border rounded bg-white"
+        >
+          Emoji
+        </button>
+
+        <button
           onClick={() => editor?.commands.toggleHighlight({ color: "#FFFF00" })}
           className={`px-2 py-1 border rounded ${
             editor?.isActive("highlight", { color: "#FFFF00" })
@@ -246,6 +268,17 @@ export default function Tiptap() {
         >
           Ordered List
         </button>
+        {showEmojiPicker && (
+          <div className="absolute z-50 mt-2">
+            <Picker
+              data={data}
+              onEmojiSelect={(emoji: any) => {
+                editor.commands.insertContent(emoji.native);
+                setShowEmojiPicker(false);
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <EditorContent editor={editor} className="border p-2 rounded" />
