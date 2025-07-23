@@ -1,7 +1,5 @@
-import RichTextEditor from "@/components/RichTextEditor";
+import Tiptap from "@/components/RichTextEditor/Tiptap";
 
 export default function AskNewQuestion() {
-  return (
-    <RichTextEditor />
-  );
+  return <Tiptap />;
 }
