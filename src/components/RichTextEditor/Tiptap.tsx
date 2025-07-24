@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
@@ -25,6 +25,8 @@ import data from "@emoji-mart/data";
 
 export default function Tiptap() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [pickerPos, setPickerPos] = useState({ top: 0, left: 0 });
+  const emojiBtnRef = useRef<HTMLButtonElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -113,6 +115,17 @@ export default function Tiptap() {
     return <div>Loading editor...</div>;
   }
 
+  const toggleEmojiPicker = () => {
+    if (!emojiBtnRef.current) return;
+
+    const rect = emojiBtnRef.current.getBoundingClientRect();
+    setPickerPos({
+      top: rect.bottom + window.scrollY + 4,
+      left: rect.left + window.scrollX,
+    });
+    setShowEmojiPicker((prev) => !prev);
+  };
+
   return (
     <div className="space-y-4 relative">
       <div className="toolbar flex flex-wrap gap-2">
@@ -193,11 +206,37 @@ export default function Tiptap() {
         </button>
 
         <button
-          onClick={() => setShowEmojiPicker((prev) => !prev)}
+          ref={emojiBtnRef}
+          onClick={toggleEmojiPicker}
           className="px-2 py-1 border rounded bg-white"
         >
           Emoji
         </button>
+
+        {showEmojiPicker && (
+          <div
+            className="absolute z-50 max-w-[90vw] sm:max-w-full"
+            style={{
+              top: pickerPos.top,
+              left:
+                pickerPos.left + 350 > window.innerWidth
+                  ? window.innerWidth - 360
+                  : pickerPos.left,
+            }}
+          >
+            <div className="max-h-[350px] overflow-auto border rounded shadow-lg bg-white">
+              <Picker
+                data={data}
+                onEmojiSelect={(emoji: any) => {
+                  editor?.commands.insertContent(emoji.native);
+                  setShowEmojiPicker(false);
+                }}
+                theme="light"
+                previewPosition="none"
+              />
+            </div>
+          </div>
+        )}
 
         <button
           onClick={() => editor?.commands.toggleHighlight({ color: "#FFFF00" })}
@@ -268,17 +307,6 @@ export default function Tiptap() {
         >
           Ordered List
         </button>
-        {showEmojiPicker && (
-          <div className="absolute z-50 mt-2">
-            <Picker
-              data={data}
-              onEmojiSelect={(emoji: any) => {
-                editor.commands.insertContent(emoji.native);
-                setShowEmojiPicker(false);
-              }}
-            />
-          </div>
-        )}
       </div>
 
       <EditorContent editor={editor} className="border p-2 rounded" />
