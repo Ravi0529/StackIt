@@ -17,6 +17,7 @@ import { BulletList, ListItem, OrderedList } from "@tiptap/extension-list";
 import Heading from "@tiptap/extension-heading";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji";
+import Image from "@tiptap/extension-image";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
@@ -27,6 +28,7 @@ export default function Tiptap() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [pickerPos, setPickerPos] = useState({ top: 0, left: 0 });
   const emojiBtnRef = useRef<HTMLButtonElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -106,6 +108,12 @@ export default function Tiptap() {
       ListItem.configure({
         HTMLAttributes: { class: "my-custom-list-item" },
       }),
+      Image.configure({
+        allowBase64: true,
+        HTMLAttributes: {
+          class: "my-custom-image rounded shadow",
+        },
+      }),
     ],
     content: "<p>Add your description here</p>",
     immediatelyRender: false,
@@ -124,6 +132,19 @@ export default function Tiptap() {
       left: rect.left + window.scrollX,
     });
     setShowEmojiPicker((prev) => !prev);
+  };
+
+  const handleLocalImageUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file && editor) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        editor.commands.setImage({ src: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -307,6 +328,31 @@ export default function Tiptap() {
         >
           Ordered List
         </button>
+
+        <button
+          onClick={() => {
+            const url = prompt("Enter image URL");
+            if (url) editor.commands.setImage({ src: url });
+          }}
+          className="px-2 py-1 border rounded bg-white"
+        >
+          Insert Image (URL)
+        </button>
+
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="px-2 py-1 border rounded bg-white"
+        >
+          Upload Image
+        </button>
+
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleLocalImageUpload}
+          className="hidden"
+        />
       </div>
 
       <EditorContent editor={editor} className="border p-2 rounded" />

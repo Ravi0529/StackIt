@@ -50,6 +50,15 @@
     border: none;
     border-top: 1px solid var(--border);
   }
+
+  .my-custom-image {
+    max-width: 100%;
+    height: auto;
+    width: 600px;
+    resize: both;
+    overflow: auto;
+    display: block;
+  }
 }
 
 @theme inline {
