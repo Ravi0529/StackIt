@@ -18,11 +18,80 @@ import Heading from "@tiptap/extension-heading";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji";
 import Image from "@tiptap/extension-image";
+import Mention from "@tiptap/extension-mention";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import tippy from "tippy.js";
+
+const users = [
+  { id: "1", label: "Ravi" },
+  { id: "2", label: "Alex" },
+  { id: "3", label: "Taylor" },
+];
+
+const createMentionSuggestion = (items: { id: string; label: string }[]) => ({
+  items: ({ query }: { query: string }) => {
+    return items
+      .filter((item) => item.label.toLowerCase().includes(query.toLowerCase()))
+      .slice(0, 5);
+  },
+  render: () => {
+    let component: HTMLDivElement;
+    let popup: any;
+
+    return {
+      onStart: (props: any) => {
+        component = document.createElement("div");
+        component.className =
+          "mention-list bg-white border rounded shadow p-1 text-sm";
+        component.style.display = "flex";
+        component.style.flexDirection = "column";
+        component.style.gap = "0.25rem";
+
+        props.items.forEach((item: any) => {
+          const el = document.createElement("button");
+          el.className =
+            "mention-item text-left hover:bg-gray-200 px-2 py-1 w-full";
+          el.textContent = item.label;
+          el.addEventListener("click", () =>
+            props.command({ id: item.id, label: item.label })
+          );
+          component.appendChild(el);
+        });
+
+        popup = tippy("body", {
+          getReferenceClientRect: props.clientRect,
+          appendTo: () => document.body,
+          content: component,
+          showOnCreate: true,
+          interactive: true,
+        })[0];
+      },
+      onUpdate: (props: any) => {
+        while (component.firstChild) {
+          component.removeChild(component.firstChild);
+        }
+
+        props.items.forEach((item: any) => {
+          const el = document.createElement("button");
+          el.className =
+            "mention-item text-left hover:bg-gray-200 px-2 py-1 w-full";
+          el.textContent = item.label;
+          el.addEventListener("click", () =>
+            props.command({ id: item.id, label: item.label })
+          );
+          component.appendChild(el);
+        });
+      },
+      onExit: () => {
+        popup?.destroy();
+      },
+    };
+  },
+});
 
 export default function Tiptap() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -112,6 +181,15 @@ export default function Tiptap() {
         allowBase64: true,
         HTMLAttributes: {
           class: "my-custom-image rounded shadow",
+        },
+      }),
+      Mention.configure({
+        HTMLAttributes: {
+          class: "mention text-blue-600 font-medium",
+        },
+        suggestion: {
+          char: "@",
+          ...createMentionSuggestion(users),
         },
       }),
     ],

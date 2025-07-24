@@ -65,6 +65,9 @@ importers:
       '@tiptap/extension-list':
         specifier: ^3.0.7
         version: 3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7)
+      '@tiptap/extension-mention':
+        specifier: ^3.0.7
+        version: 3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7)(@tiptap/suggestion@3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7))
       '@tiptap/extension-paragraph':
         specifier: ^3.0.7
         version: 3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))
@@ -86,6 +89,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^3.0.7
         version: 3.0.7
+      '@tiptap/suggestion':
+        specifier: ^3.0.7
+        version: 3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7)
       axios:
         specifier: ^1.10.0
         version: 1.10.0
@@ -1062,6 +1068,13 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.0.7
       '@tiptap/pm': ^3.0.7
+
+  '@tiptap/extension-mention@3.0.7':
+    resolution: {integrity: sha512-PHEx6NdmarjvPPvTd8D9AqK1JIaVYTsnQLxJUERakOLzujgUCToZ7FpMQDhPj97YLvF0t3jeyjZOPmFuj5kw4w==}
+    peerDependencies:
+      '@tiptap/core': ^3.0.7
+      '@tiptap/pm': ^3.0.7
+      '@tiptap/suggestion': ^3.0.7
 
   '@tiptap/extension-ordered-list@3.0.7':
     resolution: {integrity: sha512-F/cbG0vt1cjkoJ4A65E6vpZQizZwnE4gJHKAw3ymDdCoZKYaO4OV1UTo98W/jgryORy/HLO12+hogsRvgRvK9Q==}
@@ -3649,6 +3662,12 @@ snapshots:
     dependencies:
       '@tiptap/core': 3.0.7(@tiptap/pm@3.0.7)
       '@tiptap/pm': 3.0.7
+
+  '@tiptap/extension-mention@3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7)(@tiptap/suggestion@3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7))':
+    dependencies:
+      '@tiptap/core': 3.0.7(@tiptap/pm@3.0.7)
+      '@tiptap/pm': 3.0.7
+      '@tiptap/suggestion': 3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7)
 
   '@tiptap/extension-ordered-list@3.0.7(@tiptap/extension-list@3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7))':
     dependencies:
