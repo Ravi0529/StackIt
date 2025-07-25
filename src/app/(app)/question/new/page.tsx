@@ -10,9 +10,8 @@ import { Tiptap } from "@/components/RichTextEditor/Tiptap";
 
 export default function AskNewQuestionPage() {
   const [title, setTitle] = useState("");
-  const [tagsInput, setTagsInput] = useState(""); // comma-separated string
+  const [tagsInput, setTagsInput] = useState("");
   const [description, setDescription] = useState("");
-  const [coverImage, setCoverImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -33,11 +32,10 @@ export default function AskNewQuestionPage() {
         title,
         description,
         tags,
-        coverImage,
       });
 
       if (res.data.success) {
-        router.push("/feed"); // redirect to question listing page
+        router.push("/feed");
       } else {
         alert(res.data.message || "Failed to create question.");
       }
@@ -75,10 +73,7 @@ export default function AskNewQuestionPage() {
 
       <div>
         <Label>Description</Label>
-        <Tiptap
-          onChange={(content) => setDescription(content)}
-          onImageUpload={(base64Image) => setCoverImage(base64Image)}
-        />
+        <Tiptap onChange={(content) => setDescription(content)} />
       </div>
 
       <Button onClick={handleSubmit} disabled={loading}>

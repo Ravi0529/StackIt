@@ -59,7 +59,6 @@ model User {
 
 model Question {
   id          String   @id @default(uuid())
-  coverImage  String?
   title       String
   description String
   userId      String

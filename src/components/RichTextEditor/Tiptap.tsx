@@ -96,12 +96,10 @@ const createMentionSuggestion = (items: { id: string; label: string }[]) => ({
 interface TiptapProps {
   content?: string;
   onChange: (content: string) => void;
-  onImageUpload: (base64Image: string) => void;
 }
 
 export const Tiptap: React.FC<TiptapProps> = ({
   onChange,
-  onImageUpload,
   content: initialContent,
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);

@@ -2,14 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, User } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import prisma from "@/lib/prisma";
-import { v2 as cloudinary } from "cloudinary";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-  api_key: process.env.CLOUDINARY_API_KEY!,
-  api_secret: process.env.CLOUDINARY_API_SECRET!,
-});
-
 // POST handler for creating a new question
 export const POST = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
@@ -27,7 +19,7 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
-  const { coverImage, title, description, tags } = await req.json();
+  const { title, description, tags } = await req.json();
 
   if (!title || !description || !Array.isArray(tags)) {
     return NextResponse.json(
@@ -60,15 +52,6 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    let uploadedImageURL: string | null = null;
-
-    if (coverImage) {
-      const uploadResult = await cloudinary.uploader.upload(coverImage, {
-        folder: "stackit/questions",
-      });
-      uploadedImageURL = uploadResult.secure_url;
-    }
-
     const TagConnectOrCreate = tags.map((tagName: string) => ({
       where: {
         name: tagName,
@@ -82,7 +65,6 @@ export const POST = async (req: NextRequest) => {
       data: {
         title,
         description,
-        coverImage: uploadedImageURL,
         userId: userEmail.id,
         tags: {
           create: TagConnectOrCreate.map(({ where, create }) => ({

@@ -10,7 +10,6 @@ interface Question {
   id: string;
   title: string;
   description: string;
-  coverImage: string | null;
   createdAt: string;
   user: {
     username: string;

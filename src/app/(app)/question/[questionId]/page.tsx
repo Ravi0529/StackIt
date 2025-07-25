@@ -14,7 +14,6 @@ interface Question {
   title: string;
   description: string;
   createdAt: string;
-  coverImage?: string;
   user: {
     username: string;
     email: string;
@@ -39,7 +38,6 @@ export default function ParticularQuestion() {
   const [editTitle, setEditTitle] = useState("");
   const [editTags, setEditTags] = useState("");
   const [editDescription, setEditDescription] = useState("");
-  const [editCoverImage, setEditCoverImage] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -117,7 +115,6 @@ export default function ParticularQuestion() {
         title: editTitle,
         description: editDescription,
         tags,
-        coverImage: editCoverImage,
       });
 
       if (res.data.success) {
@@ -175,7 +172,6 @@ export default function ParticularQuestion() {
             <Tiptap
               content={editDescription}
               onChange={(content) => setEditDescription(content)}
-              onImageUpload={(base64) => setEditCoverImage(base64)}
             />
           </div>
 

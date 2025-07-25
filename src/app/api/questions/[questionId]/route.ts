@@ -2,13 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, User } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import prisma from "@/lib/prisma";
-import { v2 as cloudinary } from "cloudinary";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-  api_key: process.env.CLOUDINARY_API_KEY!,
-  api_secret: process.env.CLOUDINARY_API_SECRET!,
-});
 
 // GET single question by ID
 export const GET = async (
@@ -134,7 +127,7 @@ export const PUT = async (
   }
 
   try {
-    const { title, description, tags, coverImage } = await req.json();
+    const { title, description, tags } = await req.json();
 
     if (!title || !description || !Array.isArray(tags)) {
       return NextResponse.json(
@@ -178,14 +171,6 @@ export const PUT = async (
       );
     }
 
-    const uploadedImageUrl = coverImage
-      ? (
-          await cloudinary.uploader.upload(coverImage, {
-            folder: "stackit/questions",
-          })
-        ).secure_url
-      : question.coverImage;
-
     await prisma.questionTag.deleteMany({
       where: {
         questionId: questionId,
@@ -199,13 +184,16 @@ export const PUT = async (
       data: {
         title,
         description,
-        coverImage: uploadedImageUrl,
         tags: {
           create: tags.map((tagName: string) => ({
             tag: {
               connectOrCreate: {
-                where: { name: tagName },
-                create: { name: tagName },
+                where: {
+                  name: tagName,
+                },
+                create: {
+                  name: tagName,
+                },
               },
             },
           })),
