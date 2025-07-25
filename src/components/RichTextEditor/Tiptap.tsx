@@ -19,12 +19,15 @@ import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji";
 import Image from "@tiptap/extension-image";
 import Mention from "@tiptap/extension-mention";
+import { CharacterCount } from "@tiptap/extensions";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import tippy from "tippy.js";
+
+const limit = 500;
 
 const users = [
   { id: "1", label: "Ravi" },
@@ -199,6 +202,9 @@ export const Tiptap: React.FC<TiptapProps> = ({
           char: "@",
           ...createMentionSuggestion(users),
         },
+      }),
+      CharacterCount.configure({
+        limit,
       }),
     ],
     content: initialContent,
@@ -446,6 +452,19 @@ export const Tiptap: React.FC<TiptapProps> = ({
       </div>
 
       <EditorContent editor={editor} className="border p-2 rounded" />
+      {editor && (
+        <div
+          className={`text-sm text-right ${
+            editor.storage.characterCount.characters() > limit - 20
+              ? "text-red-500"
+              : "text-gray-500"
+          }`}
+        >
+          {editor.storage.characterCount.characters()}/{limit} characters &nbsp;
+          | &nbsp;
+          {editor.storage.characterCount.words()} words
+        </div>
+      )}
     </div>
   );
 };
