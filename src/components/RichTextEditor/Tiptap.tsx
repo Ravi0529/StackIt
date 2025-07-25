@@ -93,7 +93,12 @@ const createMentionSuggestion = (items: { id: string; label: string }[]) => ({
   },
 });
 
-export default function Tiptap() {
+interface TiptapProps {
+  onChange: (content: string) => void;
+  onImageUpload: (base64Image: string) => void;
+}
+
+export const Tiptap: React.FC<TiptapProps> = ({ onChange, onImageUpload }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [pickerPos, setPickerPos] = useState({ top: 0, left: 0 });
   const emojiBtnRef = useRef<HTMLButtonElement>(null);
@@ -194,6 +199,10 @@ export default function Tiptap() {
       }),
     ],
     content: "<p>Add your description here</p>",
+    onUpdate({ editor }) {
+      const html = editor.getHTML();
+      onChange(html);
+    },
     immediatelyRender: false,
   });
 
@@ -436,4 +445,4 @@ export default function Tiptap() {
       <EditorContent editor={editor} className="border p-2 rounded" />
     </div>
   );
-}
+};

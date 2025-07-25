@@ -60,9 +60,14 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    const uploadedImage = await cloudinary.uploader.upload(coverImage, {
-      folder: "stackit/questions",
-    });
+    let uploadedImageURL: string | null = null;
+
+    if (coverImage) {
+      const uploadResult = await cloudinary.uploader.upload(coverImage, {
+        folder: "stackit/questions",
+      });
+      uploadedImageURL = uploadResult.secure_url;
+    }
 
     const TagConnectOrCreate = tags.map((tagName: string) => ({
       where: {
@@ -77,7 +82,7 @@ export const POST = async (req: NextRequest) => {
       data: {
         title,
         description,
-        coverImage: uploadedImage.secure_url,
+        coverImage: uploadedImageURL,
         userId: userEmail.id,
         tags: {
           create: TagConnectOrCreate.map(({ where, create }) => ({

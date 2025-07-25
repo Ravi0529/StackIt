@@ -11,7 +11,10 @@ cloudinary.config({
 });
 
 // GET single question by ID
-export const GET = async (req: NextRequest) => {
+export const GET = async (
+  req: NextRequest,
+  { params }: { params: { questionId: string } }
+) => {
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
 
@@ -27,22 +30,21 @@ export const GET = async (req: NextRequest) => {
     );
   }
 
+  const { questionId } = await params;
+
+  if (!questionId) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Question ID is required",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
   try {
-    const { searchParams } = new URL(req.url);
-    const questionId = searchParams.get("questionId");
-
-    if (!questionId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Question ID is required",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
     const question = await prisma.question.findUnique({
       where: {
         id: questionId,
@@ -97,7 +99,10 @@ export const GET = async (req: NextRequest) => {
 };
 
 // PUT particular question by ID
-export const PUT = async (req: NextRequest) => {
+export const PUT = async (
+  req: NextRequest,
+  { params }: { params: { questionId: string } }
+) => {
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
 
@@ -113,22 +118,21 @@ export const PUT = async (req: NextRequest) => {
     );
   }
 
+  const { questionId } = await params;
+
+  if (!questionId) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Question ID is required",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
   try {
-    const { searchParams } = new URL(req.url);
-    const questionId = searchParams.get("questionId");
-
-    if (!questionId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Question ID is required",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
     const { title, description, tags, coverImage } = await req.json();
 
     if (!title || !description || !Array.isArray(tags)) {
@@ -245,7 +249,10 @@ export const PUT = async (req: NextRequest) => {
 };
 
 // DELETE particular question by ID
-export const DELETE = async (req: NextRequest) => {
+export const DELETE = async (
+  req: NextRequest,
+  { params }: { params: { questionId: string } }
+) => {
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
 
@@ -261,22 +268,21 @@ export const DELETE = async (req: NextRequest) => {
     );
   }
 
+  const { questionId } = await params;
+
+  if (!questionId) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Question ID is required",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
   try {
-    const { searchParams } = new URL(req.url);
-    const questionId = searchParams.get("questionId");
-
-    if (!questionId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Question ID is required",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
     const question = await prisma.question.findUnique({
       where: {
         id: questionId,
