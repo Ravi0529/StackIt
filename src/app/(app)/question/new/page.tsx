@@ -37,7 +37,7 @@ export default function AskNewQuestionPage() {
       });
 
       if (res.data.success) {
-        router.push("/questions"); // redirect to question listing page
+        router.push("/feed"); // redirect to question listing page
       } else {
         alert(res.data.message || "Failed to create question.");
       }

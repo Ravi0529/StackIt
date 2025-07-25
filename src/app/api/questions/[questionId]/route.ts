@@ -53,6 +53,7 @@ export const GET = async (
         user: {
           select: {
             username: true,
+            email: true,
           },
         },
         tags: {
@@ -214,6 +215,7 @@ export const PUT = async (
         user: {
           select: {
             username: true,
+            email: true,
           },
         },
         tags: {
@@ -313,6 +315,67 @@ export const DELETE = async (
       );
     }
 
+    // 🧹 Delete related records first
+    await prisma.questionTag.deleteMany({
+      where: {
+        questionId,
+      },
+    });
+
+    await prisma.mention.deleteMany({
+      where: {
+        comment: {
+          answer: {
+            questionId,
+          },
+        },
+      },
+    });
+
+    await prisma.comment.deleteMany({
+      where: {
+        answer: {
+          questionId,
+        },
+      },
+    });
+
+    await prisma.vote.deleteMany({
+      where: {
+        answer: {
+          questionId,
+        },
+      },
+    });
+
+    await prisma.notification.deleteMany({
+      where: {
+        OR: [
+          {
+            message: {
+              contains: questionId,
+            },
+          },
+          {
+            receiver: {
+              questions: {
+                some: {
+                  id: questionId,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    await prisma.answer.deleteMany({
+      where: {
+        questionId,
+      },
+    });
+
+    // ✅ Now safely delete the question
     await prisma.question.delete({
       where: {
         id: questionId,

@@ -100,7 +100,7 @@ model QuestionTag {
   questionId String
   tagId      String
 
-  question Question @relation(fields: [questionId], references: [id])
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   tag      Tag      @relation(fields: [tagId], references: [id])
 
   @@unique([questionId, tagId])
