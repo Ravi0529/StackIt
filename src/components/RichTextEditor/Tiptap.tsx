@@ -43,6 +43,7 @@ import {
   ListOrdered,
   ImageUp,
   FileImage,
+  Check,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -62,7 +63,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "../ui/input";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
 
 const headingLevels = [
   { label: "H1", level: 1, icon: Heading1 },
