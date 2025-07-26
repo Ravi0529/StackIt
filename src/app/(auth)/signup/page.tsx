@@ -60,7 +60,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1a1a1e] text-white font-mono">
+    <div className="flex min-h-screen items-center justify-center bg-[#1a1a1e] text-white font-sans">
       <Card className="w-full max-w-md shadow-lg bg-[#121215] border border-[#23232b]">
         <CardHeader>
           <CardTitle className="flex items-center justify-center gap-2 text-3xl font-extrabold text-white font-serif">

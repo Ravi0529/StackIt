@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-10 bg-[#1a1a1e] text-white font-mono">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-10 bg-[#1a1a1e] text-white font-sans">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

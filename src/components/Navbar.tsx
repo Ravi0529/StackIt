@@ -78,7 +78,7 @@ const Navbar = () => {
                 variant="default"
                 asChild
                 size="lg"
-                className="px-5 text-sm font-semibold bg-zinc-100 text-black hover:bg-zinc-200 transition font-mono"
+                className="px-5 text-sm font-semibold bg-zinc-100 text-black hover:bg-zinc-200 transition font-sans"
               >
                 <Link href="/signin">Login</Link>
               </Button>
