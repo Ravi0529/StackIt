@@ -23,6 +23,52 @@ import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
 import tippy from "tippy.js";
+import { Toggle } from "../ui/toggle";
+import {
+  Bold as BoldIcon,
+  Italic as ItalicIcon,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  ChevronDown,
+  Heading as HeadingIcon,
+  Heading1,
+  Heading2,
+  Heading3,
+  Minus,
+  Highlighter,
+  Link as LinkIcon,
+  Unlink,
+  Code,
+  List,
+  ListOrdered,
+  ImageUp,
+  FileImage,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { Input } from "../ui/input";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
+
+const headingLevels = [
+  { label: "H1", level: 1, icon: Heading1 },
+  { label: "H2", level: 2, icon: Heading2 },
+  { label: "H3", level: 3, icon: Heading3 },
+];
 
 const limit = 500;
 
@@ -120,7 +166,6 @@ export const Tiptap: React.FC<TiptapProps> = ({
         orderedList: false,
         heading: false,
         horizontalRule: false,
-        link: false,
       }),
       Bold.configure({
         HTMLAttributes: { class: "my-custom-bold" },
@@ -150,9 +195,11 @@ export const Tiptap: React.FC<TiptapProps> = ({
         HTMLAttributes: { class: "my-custom-highlight" },
       }),
       Link.configure({
-        openOnClick: false,
+        openOnClick: true,
+        autolink: true,
+        linkOnPaste: true,
         HTMLAttributes: {
-          class: "text-blue-500 underline",
+          class: "text-blue-400 underline",
         },
       }),
       CodeBlockLowlight.configure({
@@ -203,9 +250,25 @@ export const Tiptap: React.FC<TiptapProps> = ({
     immediatelyRender: false,
   });
 
-  if (!editor) {
-    return <div>Loading editor...</div>;
-  }
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+
+  const handleAddLink = () => {
+    if (url) {
+      editor?.chain().focus().setLink({ href: url }).run();
+    }
+    setUrl("");
+    setOpen(false);
+  };
+
+  const handleAddImage = () => {
+    if (imageUrl) {
+      editor?.chain().focus().setImage({ src: imageUrl }).run();
+      setImageUrl("");
+      setOpen(false);
+    }
+  };
 
   const handleLocalImageUpload = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -222,192 +285,302 @@ export const Tiptap: React.FC<TiptapProps> = ({
 
   return (
     <div className="space-y-4 relative">
-      <div className="toolbar flex flex-wrap gap-2">
-        <button
-          onClick={() => editor?.commands.toggleBold()}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("bold") ? "bg-black text-white" : "bg-white"
+      {!editor ? (
+        <div>Loading editor...</div>
+      ) : (
+        <>
+          <div className="toolbar flex flex-wrap gap-2 justify-center">
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleBold().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+          ${
+            editor?.isActive("bold")
+              ? "bg-black"
+              : "bg-black/10 hover:bg-black/20"
           }`}
-        >
-          Bold
-        </button>
+            >
+              <BoldIcon className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleItalic()}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("italic") ? "bg-black text-white" : "bg-white"
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleItalic().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+          ${
+            editor?.isActive("italic")
+              ? "bg-black"
+              : "bg-black/10 hover:bg-black/20"
           }`}
-        >
-          Italic
-        </button>
+            >
+              <ItalicIcon className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleUnderline()}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("underline") ? "bg-black text-white" : "bg-white"
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleUnderline().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+          ${
+            editor?.isActive("underline")
+              ? "bg-black"
+              : "bg-black/10 hover:bg-black/20"
           }`}
-        >
-          Underline
-        </button>
+            >
+              <UnderlineIcon className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleStrike()}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("strike") ? "bg-black text-white" : "bg-white"
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleStrike().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+          ${
+            editor?.isActive("strike")
+              ? "bg-black"
+              : "bg-black/10 hover:bg-black/20"
           }`}
-        >
-          Strike
-        </button>
+            >
+              <Strikethrough className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleHeading({ level: 1 })}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("heading", { level: 1 })
-              ? "bg-black text-white"
-              : "bg-white"
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="px-3 py-1 border border-zinc-700 text-white bg-black/10 hover:bg-black/20"
+                >
+                  <HeadingIcon className="w-4 h-4" />
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-zinc-900 border-zinc-700 text-white">
+                {headingLevels.map(({ level, icon: Icon }) => (
+                  <DropdownMenuItem
+                    key={level}
+                    onClick={() =>
+                      editor
+                        ?.chain()
+                        .focus()
+                        .toggleHeading({ level: level as 1 | 2 | 3 })
+                        .run()
+                    }
+                    className="cursor-pointer"
+                  >
+                    {editor?.isActive("heading", { level }) && (
+                      <Check className="w-4 h-4 mr-2 text-green-400" />
+                    )}
+                    <Icon className="w-4 h-4" />
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+          ${
+            editor?.isActive("horizontalRule")
+              ? "bg-black"
+              : "bg-black/10 hover:bg-black/20"
           }`}
-        >
-          H1
-        </button>
+            >
+              <Minus className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleHeading({ level: 2 })}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("heading", { level: 2 })
-              ? "bg-black text-white"
-              : "bg-white"
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleHighlight().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+          ${
+            editor?.isActive("highlight")
+              ? "bg-black"
+              : "bg-black/10 hover:bg-black/20"
           }`}
-        >
-          H2
-        </button>
+            >
+              <Highlighter className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleHeading({ level: 3 })}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("heading", { level: 3 })
-              ? "bg-black text-white"
-              : "bg-white"
-          }`}
-        >
-          H3
-        </button>
+            <AlertDialog open={open} onOpenChange={setOpen}>
+              <AlertDialogTrigger asChild>
+                <Toggle
+                  type="button"
+                  className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+            ${
+              editor?.isActive("link")
+                ? "bg-black"
+                : "bg-black/10 hover:bg-black/20"
+            }`}
+                >
+                  <LinkIcon className="w-4 h-4" />
+                </Toggle>
+              </AlertDialogTrigger>
 
-        <button
-          onClick={() => editor?.commands.setHorizontalRule()}
-          className="px-2 py-1 border rounded bg-white"
-        >
-          Horizontal Rule
-        </button>
+              <AlertDialogContent className="bg-zinc-900 text-white border-zinc-700">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Enter a URL</AlertDialogTitle>
+                </AlertDialogHeader>
+                <Input
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://example.com"
+                  className="bg-zinc-800 border-zinc-600 text-white"
+                />
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setUrl("");
+                    }}
+                    className="bg-zinc-800 text-white border-zinc-600 hover:bg-zinc-700"
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleAddLink}
+                    className="bg-zinc-100 hover:bg-zinc-200 text-black"
+                  >
+                    Add Link
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
-        <button
-          onClick={() => editor?.commands.toggleHighlight({ color: "#FFFF00" })}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("highlight", { color: "#FFFF00" })
-              ? "bg-yellow-300"
-              : "bg-white"
-          }`}
-        >
-          Highlight Yellow
-        </button>
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().unsetLink().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+            ${
+              editor?.isActive("link")
+                ? "bg-black"
+                : "bg-black/10 hover:bg-black/20"
+            }`}
+            >
+              <Unlink className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleHighlight({ color: "#FF0000" })}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("highlight", { color: "#FF0000" })
-              ? "bg-red-400 text-white"
-              : "bg-white"
-          }`}
-        >
-          Highlight Red
-        </button>
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+            ${
+              editor?.isActive("codeBlock")
+                ? "bg-black"
+                : "bg-black/10 hover:bg-black/20"
+            }`}
+            >
+              <Code className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => {
-            const url = prompt("Enter a URL");
-            if (url) editor?.commands.toggleLink({ href: url });
-          }}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("link") ? "bg-blue-500 text-white" : "bg-white"
-          }`}
-        >
-          Link
-        </button>
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+            ${
+              editor?.isActive("bulletList")
+                ? "bg-black"
+                : "bg-black/10 hover:bg-black/20"
+            }`}
+            >
+              <List className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.unsetLink()}
-          className="px-2 py-1 border rounded"
-        >
-          Remove Link
-        </button>
+            <Toggle
+              type="button"
+              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+            ${
+              editor?.isActive("orderedList")
+                ? "bg-black"
+                : "bg-black/10 hover:bg-black/20"
+            }`}
+            >
+              <ListOrdered className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleCodeBlock()}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("codeBlock")
-              ? "bg-gray-800 text-white"
-              : "bg-white"
-          }`}
-        >
-          Code Block
-        </button>
+            <Toggle
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+            ${
+              editor?.isActive("image")
+                ? "bg-black"
+                : "bg-black/10 hover:bg-black/20"
+            }`}
+            >
+              Add <ImageUp className="w-4 h-4" />
+            </Toggle>
 
-        <button
-          onClick={() => editor?.commands.toggleBulletList()}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("bulletList") ? "bg-black text-white" : "bg-white"
-          }`}
-        >
-          Bullet List
-        </button>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleLocalImageUpload}
+              className="hidden"
+            />
 
-        <button
-          onClick={() => editor?.commands.toggleOrderedList()}
-          className={`px-2 py-1 border rounded ${
-            editor?.isActive("orderedList") ? "bg-black text-white" : "bg-white"
-          }`}
-        >
-          Ordered List
-        </button>
+            <AlertDialog open={open} onOpenChange={setOpen}>
+              <AlertDialogTrigger asChild>
+                <Toggle
+                  type="button"
+                  className={`px-2 py-1 border rounded border-zinc-700 text-white transition-colors duration-200
+            ${
+              editor?.isActive("image")
+                ? "bg-black"
+                : "bg-black/10 hover:bg-black/20"
+            }`}
+                >
+                  Link <FileImage className="w-4 h-4" />
+                </Toggle>
+              </AlertDialogTrigger>
 
-        <button
-          onClick={() => {
-            const url = prompt("Enter image URL");
-            if (url) editor.commands.setImage({ src: url });
-          }}
-          className="px-2 py-1 border rounded bg-white"
-        >
-          Insert Image (URL)
-        </button>
+              <AlertDialogContent className="bg-zinc-900 text-white border-zinc-700">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Enter an image URL</AlertDialogTitle>
+                </AlertDialogHeader>
+                <Input
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="bg-zinc-800 border-zinc-600 text-white"
+                />
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setImageUrl("");
+                    }}
+                    className="bg-zinc-800 text-white border-zinc-600 hover:bg-zinc-700"
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleAddImage}
+                    className="bg-zinc-100 hover:bg-zinc-200 text-black"
+                  >
+                    Add Image
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
 
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="px-2 py-1 border rounded bg-white"
-        >
-          Upload Image
-        </button>
+          <EditorContent
+            editor={editor}
+            className="border p-3 md:p-7 rounded"
+          />
 
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleLocalImageUpload}
-          className="hidden"
-        />
-      </div>
-
-      <EditorContent editor={editor} className="border p-2 rounded" />
-      {editor && (
-        <div
-          className={`text-sm text-right ${
-            editor.storage.characterCount.characters() > limit - 20
-              ? "text-red-500"
-              : "text-gray-500"
-          }`}
-        >
-          {editor.storage.characterCount.characters()}/{limit} characters &nbsp;
-          | &nbsp;
-          {editor.storage.characterCount.words()} words
-        </div>
+          {editor && (
+            <div
+              className={`text-sm text-right ${
+                editor.storage.characterCount.characters() > limit - 20
+                  ? "text-red-500"
+                  : "text-gray-500"
+              }`}
+            >
+              {editor.storage.characterCount.characters()}/{limit} characters
+              &nbsp; | &nbsp;
+              {editor.storage.characterCount.words()} words
+            </div>
+          )}
+        </>
       )}
     </div>
   );

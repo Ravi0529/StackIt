@@ -1,57 +1,77 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { NodeViewWrapper, NodeViewContent, NodeViewProps } from "@tiptap/react";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const LANGUAGES = [
   "plaintext",
-  "javascript",
-  "typescript",
-  "html",
-  "css",
   "json",
-  "python",
-  "java",
-  "cpp",
-  "c",
-  "sql",
-  "xml",
+  "HTML",
+  "CSS",
+  "JavaScript",
+  "TypeScript",
+  "Python",
+  "C",
+  "C++",
+  "Java",
+  "SQL",
+  "XML",
 ];
 
 export default function CodeBlockComponent({
   node,
   updateAttributes,
 }: NodeViewProps) {
-  const selectRef = useRef<HTMLSelectElement>(null);
   const currentLanguage = node.attrs.language || "plaintext";
 
-  useEffect(() => {
-    if (selectRef.current) {
-      selectRef.current.value = currentLanguage;
-    }
-  }, [currentLanguage]);
-
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateAttributes({ language: e.target.value });
+  const handleLanguageChange = (language: string) => {
+    updateAttributes({ language });
   };
 
   return (
     <NodeViewWrapper
       as="div"
-      className="relative bg-[#1e1e1e] text-white rounded-lg p-2 my-4"
+      className="relative bg-[#0d0d0d] text-white rounded-lg p-4 my-4 border border-zinc-800"
     >
-      <select
-        ref={selectRef}
-        onChange={handleLanguageChange}
-        className="absolute top-2 right-2 bg-gray-700 text-white text-sm px-2 py-1 rounded"
-      >
-        {LANGUAGES.map((lang) => (
-          <option key={lang} value={lang}>
-            {lang}
-          </option>
-        ))}
-      </select>
-      <pre className="overflow-x-auto mt-6">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="absolute top-2 right-2 bg-zinc-900 border border-zinc-700 text-zinc-300 text-sm hover:bg-zinc-800 hover:text-white transition-colors px-3 py-1 rounded"
+          >
+            {currentLanguage}
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          align="end"
+          className="bg-zinc-900 text-zinc-100 border border-zinc-700 rounded-md shadow-lg"
+        >
+          {LANGUAGES.map((lang) => (
+            <DropdownMenuItem
+              key={lang}
+              onClick={() => handleLanguageChange(lang)}
+              className={`cursor-pointer px-3 py-1.5 text-sm transition-colors ${
+                currentLanguage === lang
+                  ? "bg-zinc-700 font-semibold"
+                  : "hover:bg-zinc-800"
+              }`}
+            >
+              {lang}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <pre className="overflow-x-auto mt-6 text-sm leading-relaxed font-mono">
         <code>
           <NodeViewContent as="div" />
         </code>

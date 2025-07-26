@@ -174,7 +174,7 @@ export default function AskNewQuestionPage() {
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-white text-black hover:bg-zinc-200 transition font-semibold px-6 py-2"
+            className="bg-zinc-100 text-black hover:bg-zinc-200 transition font-semibold px-6 py-2"
           >
             {loading ? (
               <>
