@@ -16,15 +16,12 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { BulletList, ListItem, OrderedList } from "@tiptap/extension-list";
 import Heading from "@tiptap/extension-heading";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import Emoji, { gitHubEmojis } from "@tiptap/extension-emoji";
 import Image from "@tiptap/extension-image";
 import Mention from "@tiptap/extension-mention";
 import { CharacterCount } from "@tiptap/extensions";
 import lowlight from "@/utils/lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import CodeBlockComponent from "./CodeBlockComponent";
-import Picker from "@emoji-mart/react";
-import data from "@emoji-mart/data";
 import tippy from "tippy.js";
 
 const limit = 500;
@@ -105,9 +102,7 @@ export const Tiptap: React.FC<TiptapProps> = ({
   onChange,
   content: initialContent,
 }) => {
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [pickerPos, setPickerPos] = useState({ top: 0, left: 0 });
-  const emojiBtnRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
@@ -148,13 +143,6 @@ export const Tiptap: React.FC<TiptapProps> = ({
       HorizontalRule.configure({
         HTMLAttributes: {
           class: "my-custom-class",
-        },
-      }),
-      Emoji.configure({
-        emojis: gitHubEmojis,
-        enableEmoticons: true,
-        HTMLAttributes: {
-          class: "my-custom-emoji",
         },
       }),
       Highlight.configure({
@@ -218,17 +206,6 @@ export const Tiptap: React.FC<TiptapProps> = ({
   if (!editor) {
     return <div>Loading editor...</div>;
   }
-
-  const toggleEmojiPicker = () => {
-    if (!emojiBtnRef.current) return;
-
-    const rect = emojiBtnRef.current.getBoundingClientRect();
-    setPickerPos({
-      top: rect.bottom + window.scrollY + 4,
-      left: rect.left + window.scrollX,
-    });
-    setShowEmojiPicker((prev) => !prev);
-  };
 
   const handleLocalImageUpload = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -321,39 +298,6 @@ export const Tiptap: React.FC<TiptapProps> = ({
         >
           Horizontal Rule
         </button>
-
-        <button
-          ref={emojiBtnRef}
-          onClick={toggleEmojiPicker}
-          className="px-2 py-1 border rounded bg-white"
-        >
-          Emoji
-        </button>
-
-        {showEmojiPicker && (
-          <div
-            className="absolute z-50 max-w-[90vw] sm:max-w-full"
-            style={{
-              top: pickerPos.top,
-              left:
-                pickerPos.left + 350 > window.innerWidth
-                  ? window.innerWidth - 360
-                  : pickerPos.left,
-            }}
-          >
-            <div className="max-h-[350px] overflow-auto border rounded shadow-lg bg-white">
-              <Picker
-                data={data}
-                onEmojiSelect={(emoji: any) => {
-                  editor?.commands.insertContent(emoji.native);
-                  setShowEmojiPicker(false);
-                }}
-                theme="light"
-                previewPosition="none"
-              />
-            </div>
-          </div>
-        )}
 
         <button
           onClick={() => editor?.commands.toggleHighlight({ color: "#FFFF00" })}
