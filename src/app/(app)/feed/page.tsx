@@ -3,8 +3,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface Question {
   id: string;
@@ -24,9 +28,8 @@ interface Question {
   };
 }
 
-// Helper function to strip HTML and truncate
 function stripAndTrimDescription(html: string, wordLimit: number): string {
-  const text = html.replace(/<[^>]+>/g, ""); // Remove HTML tags
+  const text = html.replace(/<[^>]+>/g, "");
   const words = text.split(" ");
   return words.length > wordLimit
     ? words.slice(0, wordLimit).join(" ") + "..."
@@ -45,12 +48,13 @@ export default function Feed() {
   const fetchQuestions = async (page: number) => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/questions?page=${page}`);
-      const { questions, totalPages } = res.data;
+      const response = await axios.get(`/api/questions?page=${page}`);
+      const { questions, totalPages } = response.data;
       setQuestions(questions);
       setTotalPages(totalPages);
     } catch (error) {
       console.error("Failed to fetch questions:", error);
+      toast.error("Failed to load questions. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -65,73 +69,95 @@ export default function Feed() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Questions Feed</h1>
-        <Button onClick={() => router.push("/question/new")}>
-          Ask a Question
-        </Button>
-      </div>
+    <div className="min-h-screen bg-[#1a1a1e] text-white px-4 py-10 font-sans">
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-between items-center mb-8"
+        >
+          <h1 className="text-2xl md:text-4xl font-bold font-serif">
+            Explore Hot Questions
+          </h1>
+          <Button
+            onClick={() => router.push("/question/new")}
+            className="bg-zinc-100 hover:bg-zinc-200 text-black cursor-pointer"
+          >
+            Ask a Question
+          </Button>
+        </motion.div>
 
-      {loading ? (
-        <p className="text-center">Loading questions...</p>
-      ) : (
-        <>
-          {questions.map((q) => (
-            <div
-              key={q.id}
-              className="bg-white p-4 rounded shadow mb-4 border border-gray-200"
-            >
-              <Link href={`/question/${q.id}`}>
-                <h2 className="text-xl font-semibold hover:underline">
-                  {q.title}
-                </h2>
-              </Link>
-              <p className="text-sm text-gray-600 mb-1">
-                Asked by <span className="font-medium">{q.user.username}</span>{" "}
-                • {new Date(q.createdAt).toLocaleDateString()}
-              </p>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {q.tags.map((t) => (
-                  <span
-                    key={t.tag.name}
-                    className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded"
-                  >
-                    {t.tag.name}
-                  </span>
-                ))}
-              </div>
-              <p className="text-gray-800 text-sm mb-2">
-                {stripAndTrimDescription(q.description, 30)}
-              </p>
-              <p className="text-sm text-gray-700">
-                {q._count.answers} answer{q._count.answers !== 1 && "s"}
-              </p>
-            </div>
-          ))}
-
-          {/* Pagination */}
-          <div className="flex justify-between items-center mt-6">
-            <Button
-              onClick={() => goToPage(page - 1)}
-              disabled={page <= 1}
-              variant="outline"
-            >
-              Previous
-            </Button>
-            <span className="text-sm">
-              Page {page} of {totalPages}
-            </span>
-            <Button
-              onClick={() => goToPage(page + 1)}
-              disabled={page >= totalPages}
-              variant="outline"
-            >
-              Next
-            </Button>
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <Loader2 className="animate-spin h-6 w-6 text-white" />
           </div>
-        </>
-      )}
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
+            {questions.map((q) => (
+              <Card
+                key={q.id}
+                onClick={() => router.push(`/question/${q.id}`)}
+                className="bg-zinc-900 border-zinc-700 text-white hover:border-zinc-500 cursor-pointer transition"
+              >
+                <CardContent className="p-2 pl-4 md:p-4 space-y-2">
+                  <h2 className="text-xl font-semibold font-sans hover:underline">
+                    {q.title}
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Asked by{" "}
+                    <span className="font-medium">{q.user.username}</span> •{" "}
+                    {new Date(q.createdAt).toLocaleDateString()}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {q.tags.map((t) => (
+                      <Badge
+                        key={t.tag.name}
+                        className="bg-blue-600/30 text-blue-300 border border-blue-500"
+                      >
+                        {t.tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-gray-300 text-sm hidden md:block">
+                    {stripAndTrimDescription(q.description, 20)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {q._count.answers} answer{q._count.answers !== 1 && "s"}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+
+            <div className="flex justify-between items-center mt-6">
+              <Button
+                variant="outline"
+                onClick={() => goToPage(page - 1)}
+                disabled={page <= 1}
+                className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-400">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                onClick={() => goToPage(page + 1)}
+                disabled={page >= totalPages}
+                className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700"
+              >
+                Next
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }
