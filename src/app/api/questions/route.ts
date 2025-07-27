@@ -127,7 +127,7 @@ export const GET = async (req: NextRequest) => {
       skip,
       take: ITEMS_PER_PAGE,
       orderBy: {
-        createdAt: "desc",
+        updatedAt: "desc",
       },
       include: {
         user: {

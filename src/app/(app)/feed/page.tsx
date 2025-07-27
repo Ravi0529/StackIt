@@ -11,12 +11,14 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import User from "../../../../assets/user.png";
+import { formatDistanceToNowStrict } from "date-fns";
 
 interface Question {
   id: string;
   title: string;
   description: string;
   createdAt: string;
+  updatedAt: string;
   user: {
     username: string;
     image?: string;
@@ -131,8 +133,15 @@ export default function Feed() {
                     <p className="text-sm text-gray-400">
                       Asked by{" "}
                       <span className="font-medium">{q.user.username}</span> •{" "}
-                      {new Date(q.createdAt).toLocaleDateString()}
+                      <span className="sm:hidden">
+                        {formatDistanceToNowStrict(new Date(q.updatedAt))} ago
+                      </span>
+                      <span className="hidden sm:inline">
+                        Updated{" "}
+                        {formatDistanceToNowStrict(new Date(q.updatedAt))} ago
+                      </span>
                     </p>
+
                     <div className="flex flex-wrap gap-2">
                       {q.tags.map((t) => (
                         <Badge
