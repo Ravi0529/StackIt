@@ -78,7 +78,7 @@ export default function ProfilePage() {
             className="flex items-center text-sm text-gray-400 hover:text-white transition"
           >
             <ArrowLeftCircle className="h-4 w-4 mr-2" />
-            Back to Feed
+            Back
           </button>
         </div>
         <motion.div
