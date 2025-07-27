@@ -57,12 +57,13 @@ export default function ProfilePage() {
     }
   }, [userId, session, status]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <Loader2 className="animate-spin h-6 w-6 text-white" />
+      <div className="fixed inset-0 bg-[#1a1a1e] flex items-center justify-center z-50">
+        <Loader2 className="animate-spin h-8 w-8 text-white" />
       </div>
     );
+  }
 
   if (!user)
     return (
