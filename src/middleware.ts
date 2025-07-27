@@ -23,11 +23,27 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 
+  if (!token && url.pathname.startsWith("/question/")) {
+    return NextResponse.redirect(new URL("/signin", req.url));
+  }
+
+  if (!token && url.pathname.startsWith("/profile/")) {
+    return NextResponse.redirect(new URL("/signin", req.url));
+  }
+
   return NextResponse.next();
 };
 
 // Apply middleware to these paths
 // the config.matcher field tells Next.js which routes should run this middleware
 export const config = {
-  matcher: ["/signin", "/signup", "/", "/feed", "/feed/:path*"],
+  matcher: [
+    "/signin",
+    "/signup",
+    "/",
+    "/feed",
+    "/feed/:path*",
+    "/question/:path*",
+    "/profile/:path*",
+  ],
 };
