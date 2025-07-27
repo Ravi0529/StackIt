@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import User from "../../../../assets/user.png";
 import { formatDistanceToNowStrict } from "date-fns";
+import Link from "next/link";
 
 interface Question {
   id: string;
@@ -20,6 +21,7 @@ interface Question {
   createdAt: string;
   updatedAt: string;
   user: {
+    id: string;
     username: string;
     image?: string;
   };
@@ -111,20 +113,25 @@ export default function Feed() {
                 className="bg-zinc-900 border-zinc-700 text-white hover:border-zinc-500 cursor-pointer transition"
               >
                 <CardContent className="p-2 pl-4 md:p-4 space-y-2 flex gap-4 items-start">
-                  <div className="hidden md:block">
-                    {q.user.image ? (
-                      <Image
-                        src={q.user.image || User}
-                        alt={q.user.username[0].toUpperCase()}
-                        width={40}
-                        height={40}
-                        className="w-15 h-15 rounded-full object-cover border border-zinc-700"
-                      />
-                    ) : (
-                      <div className="w-15 h-15 rounded-full bg-zinc-700 text-white flex items-center justify-center text-sm font-semibold border border-zinc-600">
-                        {q.user.username.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                  <div
+                    className="hidden md:block"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Link href={`/profile/${q.user.id}`}>
+                      {q.user.image ? (
+                        <Image
+                          src={q.user.image || User}
+                          alt={q.user.username[0].toUpperCase()}
+                          width={40}
+                          height={40}
+                          className="w-15 h-15 rounded-full object-cover border border-zinc-700"
+                        />
+                      ) : (
+                        <div className="w-15 h-15 rounded-full bg-zinc-700 text-white flex items-center justify-center text-sm font-semibold border border-zinc-600">
+                          {q.user.username.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </Link>
                   </div>
                   <div className="flex-1 space-y-2">
                     <h2 className="text-xl font-semibold font-sans hover:underline">

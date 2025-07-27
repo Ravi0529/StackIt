@@ -132,6 +132,7 @@ export const GET = async (req: NextRequest) => {
       include: {
         user: {
           select: {
+            id: true,
             username: true,
             image: true,
           },
