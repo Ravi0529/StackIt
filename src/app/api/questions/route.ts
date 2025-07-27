@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, User } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import prisma from "@/lib/prisma";
+
 // POST handler for creating a new question
 export const POST = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
@@ -132,6 +133,7 @@ export const GET = async (req: NextRequest) => {
         user: {
           select: {
             username: true,
+            image: true,
           },
         },
         tags: {

@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import User from "../../../../assets/user.png";
 
 interface Question {
   id: string;
@@ -17,6 +19,7 @@ interface Question {
   createdAt: string;
   user: {
     username: string;
+    image?: string;
   };
   tags: {
     tag: {
@@ -105,31 +108,48 @@ export default function Feed() {
                 onClick={() => router.push(`/question/${q.id}`)}
                 className="bg-zinc-900 border-zinc-700 text-white hover:border-zinc-500 cursor-pointer transition"
               >
-                <CardContent className="p-2 pl-4 md:p-4 space-y-2">
-                  <h2 className="text-xl font-semibold font-sans hover:underline">
-                    {q.title}
-                  </h2>
-                  <p className="text-sm text-gray-400">
-                    Asked by{" "}
-                    <span className="font-medium">{q.user.username}</span> •{" "}
-                    {new Date(q.createdAt).toLocaleDateString()}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {q.tags.map((t) => (
-                      <Badge
-                        key={t.tag.name}
-                        className="bg-blue-600/30 text-blue-300 border border-blue-500"
-                      >
-                        {t.tag.name}
-                      </Badge>
-                    ))}
+                <CardContent className="p-2 pl-4 md:p-4 space-y-2 flex gap-4 items-start">
+                  <div className="hidden md:block">
+                    {q.user.image ? (
+                      <Image
+                        src={q.user.image || User}
+                        alt={q.user.username[0].toUpperCase()}
+                        width={40}
+                        height={40}
+                        className="w-15 h-15 rounded-full object-cover border border-zinc-700"
+                      />
+                    ) : (
+                      <div className="w-15 h-15 rounded-full bg-zinc-700 text-white flex items-center justify-center text-sm font-semibold border border-zinc-600">
+                        {q.user.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-gray-300 text-sm hidden md:block">
-                    {stripAndTrimDescription(q.description, 20)}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {q._count.answers} answer{q._count.answers !== 1 && "s"}
-                  </p>
+                  <div className="flex-1 space-y-2">
+                    <h2 className="text-xl font-semibold font-sans hover:underline">
+                      {q.title}
+                    </h2>
+                    <p className="text-sm text-gray-400">
+                      Asked by{" "}
+                      <span className="font-medium">{q.user.username}</span> •{" "}
+                      {new Date(q.createdAt).toLocaleDateString()}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {q.tags.map((t) => (
+                        <Badge
+                          key={t.tag.name}
+                          className="bg-blue-600/30 text-blue-300 border border-blue-500"
+                        >
+                          {t.tag.name}
+                        </Badge>
+                      ))}
+                    </div>
+                    <p className="text-gray-300 text-sm hidden md:block">
+                      {stripAndTrimDescription(q.description, 20)}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {q._count.answers} answer{q._count.answers !== 1 && "s"}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             ))}

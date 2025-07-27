@@ -1,8 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import GoogleProvider from "next-auth/providers/google";
 import { randomBytes } from "crypto";
 
 export const authOptions: NextAuthOptions = {
@@ -11,16 +11,8 @@ export const authOptions: NextAuthOptions = {
       id: "credentials",
       name: "Credentials",
       credentials: {
-        email: {
-          label: "Email",
-          type: "text",
-          placeholder: "Enter your email",
-        },
-        password: {
-          label: "Password",
-          type: "password",
-          placeholder: "Enter your password",
-        },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async (credentials: any) => {
         try {
@@ -28,22 +20,20 @@ export const authOptions: NextAuthOptions = {
             where: { email: credentials?.email },
           });
 
-          if (!user) {
+          if (!user) throw new Error("Incorrect email or password");
+
+          const isPasswordCorrect = await bcrypt.compare(
+            credentials?.password,
+            user.password
+          );
+
+          if (!isPasswordCorrect) {
             throw new Error("Incorrect email or password");
           }
 
-          if (
-            user &&
-            (await bcrypt.compare(credentials?.password, user.password))
-          ) {
-            return user;
-          }
-          throw new Error("Incorrect email or password");
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            throw new Error(error.message);
-          }
-          throw new Error("Unknown error occurred during authorization.");
+          return user;
+        } catch (error: any) {
+          throw new Error(error.message || "Login failed");
         }
       },
     }),
@@ -52,79 +42,97 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
         if (!user.email) {
-          throw new Error(
-            "No email associated with this Google account. Please make your email public or use another sign-in method."
-          );
+          throw new Error("Google account must have a public email.");
         }
+
         const existingUser = await prisma.user.findUnique({
-          where: {
-            email: user.email,
-          },
+          where: { email: user.email },
         });
+
         if (!existingUser) {
-          let username = user.name
+          const baseUsername = user.name
             ? user.name.replace(/\s+/g, "").toLowerCase()
-            : user.email?.split("@")[0] || "user";
-          let uniqueUsername = username;
+            : user.email.split("@")[0];
+          let uniqueUsername = baseUsername;
           let count = 1;
           while (
             await prisma.user.findUnique({
               where: { username: uniqueUsername },
             })
           ) {
-            uniqueUsername = `${username}${count}`;
-            count++;
+            uniqueUsername = `${baseUsername}${count++}`;
           }
+
           const randomPassword = randomBytes(16).toString("hex");
+
           await prisma.user.create({
             data: {
-              username: uniqueUsername,
               email: user.email,
+              username: uniqueUsername,
               password: randomPassword,
+              image: user.image ?? null,
             },
           });
+        } else {
+          if (user.image && existingUser.image !== user.image) {
+            await prisma.user.update({
+              where: { email: user.email },
+              data: { image: user.image },
+            });
+          }
         }
       }
+
       return true;
     },
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.username = user.username;
         token.email = user.email;
+        token.image = user.image;
       }
+
       if (!token.username && token.email) {
         const dbUser = await prisma.user.findUnique({
-          where: {
-            email: token.email as string,
-          },
+          where: { email: token.email as string },
         });
+
         if (dbUser) {
-          token.username = dbUser.username;
           token.id = dbUser.id;
+          token.username = dbUser.username;
+          token.image = dbUser.image;
         }
       }
+
       return token;
     },
+
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as { id?: string }).id = token.id as string;
-        (session.user as { username?: string }).username =
-          token.username as string;
-        (session.user as { email?: string }).email = token.email as string;
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
+        session.user.email = token.email as string;
+        session.user.image = token.image as string;
       }
+
       return session;
     },
   },
+
   pages: {
     signIn: "/signin",
   },
+
   session: {
     strategy: "jwt",
   },
+
   secret: process.env.AUTH_SECRET,
 };
