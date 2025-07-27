@@ -57,7 +57,7 @@ const Navbar = () => {
                 >
                   <DropdownMenuItem asChild>
                     <Link
-                      href="/profile"
+                      href={`/profile/${user.id}`}
                       className="flex items-center px-2 py-2 w-full hover:bg-[#2a2a36] rounded-sm transition"
                     >
                       <CreditCard className="mr-2 h-4 w-4 text-white" />
