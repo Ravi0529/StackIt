@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tiptap } from "@/components/RichTextEditor/Tiptap";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface Question {
   id: string;
@@ -32,7 +34,7 @@ export default function ParticularQuestion() {
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
   const [editTitle, setEditTitle] = useState("");
@@ -43,47 +45,48 @@ export default function ParticularQuestion() {
   useEffect(() => {
     const fetchSession = async () => {
       const session = await getSession();
+      if (!session?.user) {
+        router.push("/signin");
+        toast.error("You need to be signed in to view this page.");
+        return;
+      }
       setCurrentUserEmail(session?.user?.email ?? null);
+      setSessionChecked(true);
     };
+
     fetchSession();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const fetchQuestion = async () => {
-      if (!questionId) {
-        setError("No question ID provided.");
-        setLoading(false);
-        return;
-      }
+      if (!questionId) return;
 
       try {
         const res = await axios.get(`/api/questions/${questionId}`);
         if (res.data.success) {
-          setQuestion(res.data.question);
-          setEditTitle(res.data.question.title);
-          setEditTags(
-            res.data.question.tags.map((t: any) => t.tag.name).join(", ")
-          );
-          setEditDescription(res.data.question.description);
-        } else {
-          setError(res.data.message || "Failed to load question");
+          const q = res.data.question;
+          setQuestion(q);
+          setEditTitle(q.title);
+          setEditTags(q.tags.map((t: any) => t.tag.name).join(", "));
+          setEditDescription(q.description);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error fetching question:", err);
-        setError("Something went wrong while fetching the question.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchQuestion();
-  }, [questionId]);
+    if (sessionChecked) {
+      fetchQuestion();
+    }
+  }, [questionId, sessionChecked]);
 
   const handleDelete = async () => {
-    const confirm = window.confirm(
+    const confirmDelete = window.confirm(
       "Are you sure you want to delete this question?"
     );
-    if (!confirm) return;
+    if (!confirmDelete) return;
 
     try {
       const res = await axios.delete(`/api/questions/${questionId}`);
@@ -93,7 +96,7 @@ export default function ParticularQuestion() {
       } else {
         alert(res.data.message || "Failed to delete question");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error deleting question:", error);
       alert("Something went wrong while deleting the question.");
     }
@@ -124,24 +127,37 @@ export default function ParticularQuestion() {
       } else {
         alert(res.data.message || "Failed to update question");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error updating question:", err);
       alert("Something went wrong while updating the question.");
     }
   };
 
-  const isAuthor = question?.user.email === currentUserEmail;
-
-  if (loading)
-    return <div className="p-6 text-center">Loading question...</div>;
-  if (error)
+  if (!sessionChecked) {
     return (
-      <div className="p-6 text-center text-red-600 font-semibold">{error}</div>
+      <div className="flex items-center justify-center min-h-[60vh] text-gray-500">
+        <Loader2 className="animate-spin w-6 h-6 mr-2" />
+        Checking session...
+      </div>
     );
-  if (!question)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] text-gray-500">
+        <Loader2 className="animate-spin w-6 h-6 mr-2" />
+        Loading question...
+      </div>
+    );
+  }
+
+  if (!question) {
     return (
       <div className="p-6 text-center text-gray-600">Question not found.</div>
     );
+  }
+
+  const isAuthor = question.user.email === currentUserEmail;
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">

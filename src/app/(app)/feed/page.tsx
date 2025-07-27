@@ -13,6 +13,7 @@ import Image from "next/image";
 import User from "../../../../assets/user.png";
 import { formatDistanceToNowStrict } from "date-fns";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface Question {
   id: string;
@@ -35,22 +36,25 @@ interface Question {
   };
 }
 
-function stripAndTrimDescription(html: string, wordLimit: number): string {
-  const text = html.replace(/<[^>]+>/g, "");
-  const words = text.split(" ");
-  return words.length > wordLimit
-    ? words.slice(0, wordLimit).join(" ") + "..."
-    : text;
-}
-
 export default function Feed() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1");
 
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated";
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+
+  function stripAndTrimDescription(html: string, wordLimit: number): string {
+    const text = html.replace(/<[^>]+>/g, "");
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  }
 
   const fetchQuestions = async (page: number) => {
     setLoading(true);
@@ -87,12 +91,14 @@ export default function Feed() {
           <h1 className="text-2xl md:text-4xl font-bold font-serif">
             Explore Hot Questions
           </h1>
-          <Button
-            onClick={() => router.push("/question/new")}
-            className="bg-zinc-100 hover:bg-zinc-200 text-black cursor-pointer"
-          >
-            Ask a Question
-          </Button>
+          {isAuthenticated && (
+            <Button
+              onClick={() => router.push("/question/new")}
+              className="bg-zinc-100 hover:bg-zinc-200 text-black cursor-pointer"
+            >
+              Ask a Question
+            </Button>
+          )}
         </motion.div>
 
         {loading ? (
