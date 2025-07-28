@@ -113,14 +113,14 @@ export default function SingleQuestionDetails() {
 
   const handleDelete = async () => {
     try {
-      const res = await axios.delete(`/api/questions/${questionId}`);
-      if (res.data.success) {
+      const response = await axios.delete(`/api/questions/${questionId}`);
+      if (response.data.success) {
         toast.success("Question deleted successfully");
         router.push("/feed");
       } else {
-        toast.error(res.data.message || "Deletion failed");
+        toast.error(response.data.message || "Deletion failed");
       }
-    } catch (err) {
+    } catch (error) {
       toast.error("Something went wrong while deleting.");
     }
   };
