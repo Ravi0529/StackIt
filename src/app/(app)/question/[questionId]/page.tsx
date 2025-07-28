@@ -7,18 +7,26 @@ import { getSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tiptap } from "@/components/RichTextEditor/Tiptap";
-import { Loader2 } from "lucide-react";
+import { ArrowLeftCircle, Loader2, Pencil, Trash2 } from "lucide-react";
+import User from "../../../../../assets/user.png";
 import { toast } from "sonner";
+import Image from "next/image";
+import Link from "next/link";
+import { formatDistanceToNowStrict } from "date-fns";
 
 interface Question {
   id: string;
   title: string;
   description: string;
   createdAt: string;
+  updatedAt: string;
   user: {
+    id: string;
     username: string;
     email: string;
+    image?: string | null;
   };
   tags: {
     tag: {
@@ -41,64 +49,57 @@ export default function ParticularQuestion() {
   const [editTags, setEditTags] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSession = async () => {
       const session = await getSession();
       if (!session?.user) {
-        router.push("/signin");
         toast.error("You need to be signed in to view this page.");
+        router.push("/signin");
         return;
       }
       setCurrentUserEmail(session?.user?.email ?? null);
       setSessionChecked(true);
     };
-
     fetchSession();
   }, [router]);
 
   useEffect(() => {
     const fetchQuestion = async () => {
-      if (!questionId) return;
-
       try {
-        const res = await axios.get(`/api/questions/${questionId}`);
-        if (res.data.success) {
-          const q = res.data.question;
+        const response = await axios.get(`/api/questions/${questionId}`);
+        if (response.data.success) {
+          const q = response.data.question;
           setQuestion(q);
           setEditTitle(q.title);
-          setEditTags(q.tags.map((t: any) => t.tag.name).join(", "));
+          setEditTags(
+            q.tags.map((t: { tag: { name: string } }) => t.tag.name).join(", ")
+          );
           setEditDescription(q.description);
         }
-      } catch (err) {
-        console.error("Error fetching question:", err);
+      } catch (error) {
+        setError("Failed to load question.");
       } finally {
         setLoading(false);
       }
     };
-
-    if (sessionChecked) {
+    if (sessionChecked && questionId) {
       fetchQuestion();
     }
   }, [questionId, sessionChecked]);
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this question?"
-    );
-    if (!confirmDelete) return;
-
     try {
       const res = await axios.delete(`/api/questions/${questionId}`);
       if (res.data.success) {
-        alert("Question deleted successfully");
+        toast.success("Question deleted successfully");
         router.push("/feed");
       } else {
-        alert(res.data.message || "Failed to delete question");
+        toast.error(res.data.message || "Deletion failed");
       }
-    } catch (error) {
-      console.error("Error deleting question:", error);
-      alert("Something went wrong while deleting the question.");
+    } catch (err) {
+      toast.error("Something went wrong while deleting.");
     }
   };
 
@@ -109,7 +110,7 @@ export default function ParticularQuestion() {
       .filter(Boolean);
 
     if (!editTitle || !editDescription || tags.length === 0) {
-      alert("All fields are required");
+      toast.error("Title, description and at least one tag are required.");
       return;
     }
 
@@ -121,128 +122,187 @@ export default function ParticularQuestion() {
       });
 
       if (res.data.success) {
-        setQuestion(res.data.question);
+        toast.success("Question updated successfully");
         setIsEditing(false);
-        alert("Question updated successfully");
+        setQuestion(res.data.question);
       } else {
-        alert(res.data.message || "Failed to update question");
+        toast.error(res.data.message || "Update failed");
       }
-    } catch (err) {
-      console.error("Error updating question:", err);
-      alert("Something went wrong while updating the question.");
+    } catch {
+      toast.error("Something went wrong while updating.");
     }
   };
 
-  if (!sessionChecked) {
+  if (!sessionChecked || loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] text-gray-500">
-        <Loader2 className="animate-spin w-6 h-6 mr-2" />
-        Checking session...
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-gray-500">
-        <Loader2 className="animate-spin w-6 h-6 mr-2" />
-        Loading question...
+      <div className="flex justify-center items-center h-screen bg-[#1a1a1e] text-zinc-300">
+        <Loader2 className="animate-spin h-6 w-6 mr-2 text-zinc-400" />
+        <span className="text-sm font-medium">Loading...</span>
       </div>
     );
   }
 
   if (!question) {
     return (
-      <div className="p-6 text-center text-gray-600">Question not found.</div>
+      <Alert
+        variant="destructive"
+        className="bg-red-900/30 border-red-800 text-white max-w-xl mx-auto mt-12"
+      >
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>Question not found.</AlertDescription>
+      </Alert>
     );
   }
 
   const isAuthor = question.user.email === currentUserEmail;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      {isEditing ? (
-        <>
-          <div>
-            <Label htmlFor="edit-title">Title</Label>
-            <Input
-              id="edit-title"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="edit-tags">Tags</Label>
-            <Input
-              id="edit-tags"
-              value={editTags}
-              onChange={(e) => setEditTags(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label>Description</Label>
-            <Tiptap
-              content={editDescription}
-              onChange={(content) => setEditDescription(content)}
-            />
-          </div>
-
-          <div className="flex gap-4">
-            <Button onClick={handleUpdate}>Save</Button>
-            <Button variant="secondary" onClick={() => setIsEditing(false)}>
-              Cancel
-            </Button>
-          </div>
-        </>
-      ) : (
-        <>
-          <h1 className="text-3xl font-bold mb-2">{question.title}</h1>
-          <p className="text-sm text-gray-500 mb-4">
-            Asked by{" "}
-            <span className="font-medium text-gray-700">
-              {question.user.username}
-            </span>{" "}
-            • {new Date(question.createdAt).toLocaleDateString()}
-          </p>
-
-          <div className="flex flex-wrap gap-2 mb-4">
-            {question.tags.map((t) => (
-              <span
-                key={t.tag.name}
-                className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
-              >
-                {t.tag.name}
-              </span>
-            ))}
-          </div>
-
-          <div
-            className="prose max-w-none mb-6"
-            dangerouslySetInnerHTML={{ __html: question.description }}
-          />
-
-          {isAuthor && (
-            <div className="flex gap-4">
-              <Button
-                onClick={() => setIsEditing(true)}
-                className="bg-yellow-500 text-white hover:bg-yellow-600"
-              >
-                Edit
-              </Button>
-              <Button
-                onClick={handleDelete}
-                className="bg-red-500 text-white hover:bg-red-600"
-              >
-                Delete
-              </Button>
+    <div className="min-h-screen bg-[#1a1a1e] text-white px-4 py-10 font-sans">
+      <div className="max-w-3xl mx-auto space-y-8">
+        <div>
+          <button
+            onClick={() => router.back()}
+            className="flex items-center text-sm text-gray-400 hover:text-white transition"
+          >
+            <ArrowLeftCircle className="h-4 w-4 mr-2" />
+            Back to Feed
+          </button>
+        </div>
+        {isEditing ? (
+          <>
+            <h1 className="text-3xl font-serif font-bold">Edit Question</h1>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-title">Title</Label>
+                <Input
+                  id="edit-title"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="bg-zinc-900 border-zinc-700 text-white text-xl"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-tags">Tags (comma separated)</Label>
+                <Input
+                  id="edit-tags"
+                  value={editTags}
+                  onChange={(e) => setEditTags(e.target.value)}
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
+              </div>
+              <div>
+                <Label>Description</Label>
+                <div className="bg-zinc-900 border border-zinc-700 rounded-md p-2">
+                  <Tiptap
+                    content={editDescription}
+                    onChange={setEditDescription}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <Button
+                  onClick={handleUpdate}
+                  className="bg-zinc-100 text-black hover:bg-zinc-200"
+                >
+                  Save Changes
+                </Button>
+                <Button variant="secondary" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </Button>
+              </div>
             </div>
-          )}
-        </>
-      )}
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl sm:text-4xl font-serif font-bold mb-2">
+              {question.title}
+            </h1>
+            <Link href={`/profile/${question.user.id}`}>
+              <div className="flex items-center gap-3 mb-4 text-sm text-gray-400">
+                {question.user.image ? (
+                  <Image
+                    src={question.user.image || User}
+                    alt={question.user.username[0].toUpperCase()}
+                    width={40}
+                    height={40}
+                    className="w-8 h-8 rounded-full object-cover border border-zinc-700"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white text-xs">
+                    {question.user.username[0].toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  Asked by{" "}
+                  <span className="font-medium text-white">
+                    {question.user.username}
+                  </span>{" "}
+                  • {formatDistanceToNowStrict(new Date(question.updatedAt))}{" "}
+                  ago
+                </div>
+              </div>
+            </Link>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {question.tags.map((t) => (
+                <span
+                  key={t.tag.name}
+                  className="text-sm bg-blue-600/30 text-blue-200 px-3 py-1 rounded-full border border-blue-500"
+                >
+                  {t.tag.name}
+                </span>
+              ))}
+            </div>
+            <div
+              className="prose prose-invert max-w-full sm:prose-base prose-sm break-words overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: question.description }}
+            />
+            <style jsx global>{`
+              .prose h1 {
+                font-size: 1.75rem;
+              }
+
+              .prose h2 {
+                font-size: 1.5rem;
+              }
+
+              .prose h3 {
+                font-size: 1.25rem;
+              }
+
+              .prose pre {
+                background-color: #0d0d0d;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                overflow-x: auto;
+              }
+
+              .prose code {
+                background-color: #1e1e1e;
+                padding: 0.2rem 0.4rem;
+                border-radius: 0.25rem;
+                color: #f472b6;
+              }
+            `}</style>
+
+            {isAuthor && (
+              <div className="flex gap-4 mt-6">
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-yellow-500 text-white hover:bg-yellow-600"
+                >
+                  <Pencil className="h-4 w-4 mr-2" /> Edit
+                </Button>
+                <Button
+                  onClick={handleDelete}
+                  className="bg-red-500 text-white hover:bg-red-600"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

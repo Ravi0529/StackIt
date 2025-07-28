@@ -45,8 +45,10 @@ export const GET = async (
       include: {
         user: {
           select: {
+            id: true,
             username: true,
             email: true,
+            image: true,
           },
         },
         tags: {
