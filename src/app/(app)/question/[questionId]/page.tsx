@@ -69,7 +69,8 @@ export default function SingleQuestionDetails() {
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
   const [editTitle, setEditTitle] = useState("");
-  const [editTags, setEditTags] = useState("");
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [editTagInput, setEditTagInput] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,9 +97,7 @@ export default function SingleQuestionDetails() {
           const q = response.data.question;
           setQuestion(q);
           setEditTitle(q.title);
-          setEditTags(
-            q.tags.map((t: { tag: { name: string } }) => t.tag.name).join(", ")
-          );
+          setEditTags(q.tags.map((t: { tag: { name: string } }) => t.tag.name));
           setEditDescription(q.description);
         }
       } catch (error) {
@@ -127,10 +126,7 @@ export default function SingleQuestionDetails() {
   };
 
   const handleUpdate = async () => {
-    const tags = editTags
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
+    const tags = editTags.filter(Boolean);
 
     if (!editTitle || !editDescription || tags.length === 0) {
       toast.error("Title, description and at least one tag are required.");
@@ -138,18 +134,18 @@ export default function SingleQuestionDetails() {
     }
 
     try {
-      const res = await axios.put(`/api/questions/${questionId}`, {
+      const response = await axios.put(`/api/questions/${questionId}`, {
         title: editTitle,
         description: editDescription,
         tags,
       });
 
-      if (res.data.success) {
+      if (response.data.success) {
         toast.success("Question updated successfully");
         setIsEditing(false);
-        setQuestion(res.data.question);
+        setQuestion(response.data.question);
       } else {
-        toast.error(res.data.message || "Update failed");
+        toast.error(response.data.message || "Update failed");
       }
     } catch {
       toast.error("Something went wrong while updating.");
@@ -196,25 +192,18 @@ export default function SingleQuestionDetails() {
             <h1 className="text-3xl font-serif font-bold">Edit Question</h1>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="edit-title">Title</Label>
+                <Label htmlFor="edit-title" className="mb-2">
+                  Title
+                </Label>
                 <Input
                   id="edit-title"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="bg-zinc-900 border-zinc-700 text-white text-xl"
+                  className="bg-zinc-900 border-zinc-700 text-white !text-xl"
                 />
               </div>
               <div>
-                <Label htmlFor="edit-tags">Tags (comma separated)</Label>
-                <Input
-                  id="edit-tags"
-                  value={editTags}
-                  onChange={(e) => setEditTags(e.target.value)}
-                  className="bg-zinc-900 border-zinc-700 text-white"
-                />
-              </div>
-              <div>
-                <Label>Description</Label>
+                <Label className="mb-2">Description</Label>
                 <div className="bg-zinc-900 border border-zinc-700 rounded-md p-2">
                   <Tiptap
                     content={editDescription}
@@ -222,6 +211,60 @@ export default function SingleQuestionDetails() {
                   />
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-tags" className="text-white">
+                  Tags
+                </Label>
+
+                <Input
+                  id="edit-tags"
+                  placeholder="Type a tag and press Enter or comma"
+                  value={editTagInput}
+                  onChange={(e) => setEditTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (
+                      (e.key === "Enter" || e.key === ",") &&
+                      editTagInput.trim()
+                    ) {
+                      e.preventDefault();
+                      const newTag = editTagInput.trim().replace(/,/g, "");
+                      if (!editTags.includes(newTag)) {
+                        setEditTags([...editTags, newTag]);
+                      }
+                      setEditTagInput("");
+                    }
+                    if (
+                      e.key === "Backspace" &&
+                      !editTagInput &&
+                      editTags.length > 0
+                    ) {
+                      setEditTags((prev) => prev.slice(0, -1));
+                    }
+                  }}
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
+
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {editTags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="flex items-center gap-1 bg-blue-600/30 text-blue-200 px-3 py-1 rounded-full text-sm border border-blue-500"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditTags(editTags.filter((_, i) => i !== idx))
+                        }
+                        className="hover:text-white text-blue-300"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex gap-4">
                 <Button
                   onClick={handleUpdate}
@@ -229,7 +272,11 @@ export default function SingleQuestionDetails() {
                 >
                   Save Changes
                 </Button>
-                <Button variant="secondary" onClick={() => setIsEditing(false)}>
+                <Button
+                  variant="secondary"
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium"
+                  onClick={() => setIsEditing(false)}
+                >
                   Cancel
                 </Button>
               </div>
