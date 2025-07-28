@@ -4,12 +4,35 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { getSession } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tiptap } from "@/components/RichTextEditor/Tiptap";
-import { ArrowLeftCircle, Loader2, Pencil, Trash2 } from "lucide-react";
+import {
+  ArrowLeftCircle,
+  Loader2,
+  Pencil,
+  Trash2,
+  MoreHorizontal,
+} from "lucide-react";
 import User from "../../../../../assets/user.png";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -217,8 +240,8 @@ export default function ParticularQuestion() {
             <h1 className="text-2xl sm:text-4xl font-serif font-bold mb-2">
               {question.title}
             </h1>
-            <Link href={`/profile/${question.user.id}`}>
-              <div className="flex items-center gap-3 mb-4 text-sm text-gray-400">
+            <div className="flex items-center gap-3 mb-4 text-sm text-gray-400">
+              <Link href={`/profile/${question.user.id}`}>
                 {question.user.image ? (
                   <Image
                     src={question.user.image || User}
@@ -232,16 +255,74 @@ export default function ParticularQuestion() {
                     {question.user.username[0].toUpperCase()}
                   </div>
                 )}
-                <div>
-                  Asked by{" "}
+              </Link>
+              <div>
+                Asked by{" "}
+                <Link href={`/profile/${question.user.id}`}>
                   <span className="font-medium text-white">
                     {question.user.username}
-                  </span>{" "}
-                  • {formatDistanceToNowStrict(new Date(question.updatedAt))}{" "}
-                  ago
-                </div>
+                  </span>
+                </Link>{" "}
+                • {formatDistanceToNowStrict(new Date(question.updatedAt))} ago
               </div>
-            </Link>
+              {isAuthor && (
+                <div className="relative">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="p-1 h-auto w-auto text-white bg-[#1a1a1e] hover:bg-[#1a1a1e]"
+                      >
+                        <MoreHorizontal className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="bg-zinc-800 border-zinc-700 text-white"
+                    >
+                      <DropdownMenuItem
+                        onClick={() => setIsEditing(true)}
+                        className="cursor-pointer hover:bg-zinc-700"
+                      >
+                        <Pencil className="h-4 w-4 inline mr-1 font-medium text-white" />{" "}
+                        Edit
+                      </DropdownMenuItem>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                            className="cursor-pointer hover:bg-red-700 text-red-500"
+                          >
+                            <Trash2 className="h-4 w-4 inline mr-1 font-medium text-red-500" />
+                            Delete
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete the question.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-zinc-700 hover:bg-zinc-600 text-white hover:text-white">
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDelete}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2 mb-6">
               {question.tags.map((t) => (
                 <span
@@ -283,23 +364,6 @@ export default function ParticularQuestion() {
                 color: #f472b6;
               }
             `}</style>
-
-            {isAuthor && (
-              <div className="flex gap-4 mt-6">
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-yellow-500 text-white hover:bg-yellow-600"
-                >
-                  <Pencil className="h-4 w-4 mr-2" /> Edit
-                </Button>
-                <Button
-                  onClick={handleDelete}
-                  className="bg-red-500 text-white hover:bg-red-600"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" /> Delete
-                </Button>
-              </div>
-            )}
           </>
         )}
       </div>
