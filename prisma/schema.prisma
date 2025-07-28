@@ -74,7 +74,8 @@ model Question {
 model Answer {
   id          String   @id @default(uuid())
   description String
-  isAccepted  Boolean  @default(false)
+  isApproved  Boolean  @default(false)
+  status      String   @default("pending")
   userId      String
   questionId  String
   createdAt   DateTime @default(now())
