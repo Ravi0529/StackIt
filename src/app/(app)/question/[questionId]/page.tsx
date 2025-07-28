@@ -58,7 +58,7 @@ interface Question {
   }[];
 }
 
-export default function ParticularQuestion() {
+export default function SingleQuestionDetails() {
   const params = useParams();
   const router = useRouter();
   const questionId = params?.questionId as string;
