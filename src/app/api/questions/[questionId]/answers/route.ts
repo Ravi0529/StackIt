@@ -119,13 +119,17 @@ export const POST = async (
       );
     }
 
-    const questionExists = await prisma.question.findUnique({
+    const question = await prisma.question.findUnique({
       where: {
         id: questionId,
       },
+      select: {
+        id: true,
+        userId: true,
+      },
     });
 
-    if (!questionExists) {
+    if (!question) {
       return NextResponse.json(
         {
           success: false,
@@ -146,6 +150,17 @@ export const POST = async (
         status: "pending",
       },
     });
+
+    if (userId !== question.userId) {
+      await prisma.notification.create({
+        data: {
+          senderId: userId,
+          receiverId: question.userId,
+          type: "ANSWERED",
+          message: "Someone answered your question.",
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

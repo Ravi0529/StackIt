@@ -305,7 +305,6 @@ export const DELETE = async (
       );
     }
 
-    // 🧹 Delete related records first
     await prisma.questionTag.deleteMany({
       where: {
         questionId,
@@ -365,7 +364,6 @@ export const DELETE = async (
       },
     });
 
-    // ✅ Now safely delete the question
     await prisma.question.delete({
       where: {
         id: questionId,
