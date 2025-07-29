@@ -115,7 +115,7 @@ model Vote {
   createdAt DateTime @default(now())
 
   user   User   @relation(fields: [userId], references: [id])
-  answer Answer @relation(fields: [answerId], references: [id])
+  answer Answer @relation(fields: [answerId], references: [id], onDelete: Cascade)
 
   @@unique([userId, answerId])
 }
@@ -129,8 +129,8 @@ model Notification {
   isRead     Boolean          @default(false)
   createdAt  DateTime         @default(now())
 
-  sender   User @relation("SenderNotifications", fields: [senderId], references: [id])
-  receiver User @relation("ReceiverNotifications", fields: [receiverId], references: [id])
+  sender   User @relation("SenderNotifications", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceiverNotifications", fields: [receiverId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -142,7 +142,7 @@ model Comment {
   updatedAt DateTime @updatedAt
 
   user     User      @relation(fields: [userId], references: [id])
-  answer   Answer    @relation(fields: [answerId], references: [id])
+  answer   Answer    @relation(fields: [answerId], references: [id], onDelete: Cascade)
   mentions Mention[]
 }
 
@@ -152,7 +152,7 @@ model Mention {
   commentId       String
 
   mentionedUser User    @relation(fields: [mentionedUserId], references: [id])
-  comment       Comment @relation(fields: [commentId], references: [id])
+  comment       Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }
 
 model AdminPanel {
