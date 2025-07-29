@@ -38,6 +38,8 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
+import AnswerInput from "@/components/AnswerInput";
+import AnswerDetails from "@/components/AnswerDetails";
 
 interface Question {
   id: string;
@@ -413,6 +415,12 @@ export default function SingleQuestionDetails() {
             `}</style>
           </>
         )}
+
+        <AnswerDetails questionId={question.id} />
+        <AnswerInput
+          questionId={question.id}
+          onAnswerSubmit={() => window.location.reload()}
+        />
       </div>
     </div>
   );
