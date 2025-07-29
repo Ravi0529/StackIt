@@ -209,26 +209,6 @@ export const DELETE = async (
       );
     }
 
-    await prisma.comment.deleteMany({
-      where: {
-        answerId,
-      },
-    });
-
-    await prisma.mention.deleteMany({
-      where: {
-        comment: {
-          answerId,
-        },
-      },
-    });
-
-    await prisma.vote.deleteMany({
-      where: {
-        answerId,
-      },
-    });
-
     await prisma.notification.deleteMany({
       where: {
         AND: [

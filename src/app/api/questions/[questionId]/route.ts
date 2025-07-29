@@ -305,38 +305,6 @@ export const DELETE = async (
       );
     }
 
-    await prisma.questionTag.deleteMany({
-      where: {
-        questionId,
-      },
-    });
-
-    await prisma.mention.deleteMany({
-      where: {
-        comment: {
-          answer: {
-            questionId,
-          },
-        },
-      },
-    });
-
-    await prisma.comment.deleteMany({
-      where: {
-        answer: {
-          questionId,
-        },
-      },
-    });
-
-    await prisma.vote.deleteMany({
-      where: {
-        answer: {
-          questionId,
-        },
-      },
-    });
-
     await prisma.notification.deleteMany({
       where: {
         OR: [
@@ -355,12 +323,6 @@ export const DELETE = async (
             },
           },
         ],
-      },
-    });
-
-    await prisma.answer.deleteMany({
-      where: {
-        questionId,
       },
     });
 
