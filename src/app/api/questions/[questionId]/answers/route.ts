@@ -25,7 +25,6 @@ export const GET = async (
     const answers = await prisma.answer.findMany({
       where: {
         questionId,
-        isApproved: true,
       },
       include: {
         user: {
