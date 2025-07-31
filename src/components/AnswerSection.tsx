@@ -14,6 +14,8 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Check,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { Tiptap } from "@/components/RichTextEditor/Tiptap";
@@ -51,6 +53,9 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
   const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [answerToDelete, setAnswerToDelete] = useState<string | null>(null);
+  const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [answerToModerate, setAnswerToModerate] = useState<string | null>(null);
   const { data: session } = useSession();
 
   const fetchAnswers = async () => {
@@ -238,6 +243,46 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
     }
   };
 
+  const handleAccept = async () => {
+    if (!answerToModerate) return;
+
+    try {
+      await axios.put(`/api/answers/${answerToModerate}/approve`);
+      setAnswers((prev) =>
+        prev.map((answer) =>
+          answer.id === answerToModerate
+            ? { ...answer, status: "approved", isApproved: true }
+            : answer
+        )
+      );
+      toast.success("Answer approved successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to approve answer");
+    } finally {
+      setAnswerToModerate(null);
+      setAcceptDialogOpen(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!answerToModerate) return;
+
+    try {
+      await axios.delete(`/api/answers/${answerToModerate}/reject`);
+      setAnswers((prev) =>
+        prev.filter((answer) => answer.id !== answerToModerate)
+      );
+      toast.success("Answer rejected successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to reject answer");
+    } finally {
+      setAnswerToModerate(null);
+      setRejectDialogOpen(false);
+    }
+  };
+
   useEffect(() => {
     if (questionId) {
       fetchAnswers();
@@ -408,6 +453,35 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                   </DropdownMenu>
                 )}
               </div>
+
+              {/* Add this inside the answer div's header section */}
+              {session?.user?.id !== answer.user?.id &&
+                answer.status === "pending" && (
+                  <div className="flex gap-2 ml-auto">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-green-500 hover:bg-green-500/10 hover:text-green-500"
+                      onClick={() => {
+                        setAnswerToModerate(answer.id);
+                        setAcceptDialogOpen(true);
+                      }}
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-red-500 hover:bg-red-500/10 hover:text-red-500"
+                      onClick={() => {
+                        setAnswerToModerate(answer.id);
+                        setRejectDialogOpen(true);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
             </div>
 
             <div
@@ -454,6 +528,52 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
               onClick={handleDelete}
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Accept confirmation dialog */}
+      <AlertDialog open={acceptDialogOpen} onOpenChange={setAcceptDialogOpen}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve this answer?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will mark the answer as approved and visible to everyone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white hover:text-white">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-green-600 hover:bg-green-700"
+              onClick={handleAccept}
+            >
+              Approve
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject this answer?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the answer. This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white hover:text-white">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={handleReject}
+            >
+              Reject
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
