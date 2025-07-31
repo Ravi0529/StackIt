@@ -115,7 +115,25 @@ export const PUT = async (
         isApproved: false,
         status: "pending",
       },
+      include: {
+        question: {
+          select: {
+            userId: true,
+          },
+        },
+      },
     });
+
+    if (updatedAnswer.question.userId !== currentUser.id) {
+      await prisma.notification.create({
+        data: {
+          senderId: currentUser.id,
+          receiverId: updatedAnswer.question.userId,
+          type: "ANSWERED",
+          message: `Your question has an updated answer from ${session.user.username}`,
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,
@@ -173,9 +191,13 @@ export const DELETE = async (
       where: {
         id: answerId,
       },
-      select: {
-        id: true,
-        userId: true,
+      include: {
+        question: {
+          select: {
+            userId: true,
+            id: true,
+          },
+        },
       },
     });
 
@@ -211,20 +233,15 @@ export const DELETE = async (
 
     await prisma.notification.deleteMany({
       where: {
-        AND: [
-          {
-            type: "ANSWERED",
-          },
-          {
-            sender: {
-              answers: {
-                some: {
-                  id: answerId,
-                },
-              },
-            },
-          },
-        ],
+        type: "ANSWERED",
+        senderId: user.id,
+        receiverId: existingAnswer.question.userId,
+        createdAt: {
+          gte: existingAnswer.createdAt,
+        },
+        message: {
+          contains: `answer from ${session.user.username}`,
+        },
       },
     });
 
@@ -236,7 +253,7 @@ export const DELETE = async (
 
     return NextResponse.json({
       success: true,
-      message: "Answer and related data deleted successfully",
+      message: "Answer and related notification deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting answer:", error);
