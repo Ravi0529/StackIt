@@ -419,11 +419,11 @@ export default function SingleQuestionDetails() {
 
         <Separator />
 
-        <AnswerDetails questionId={question.id} />
         <AnswerInput
           questionId={question.id}
           onAnswerSubmit={() => window.location.reload()}
         />
+        <AnswerDetails questionId={question.id} />
       </div>
     </div>
   );

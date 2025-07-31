@@ -95,7 +95,6 @@ export default function AnswerDetails({ questionId }: AnswerDetailsProps) {
 
   return (
     <div className="mt-10">
-      <h2 className="text-xl font-serif font-semibold mb-6">Answers</h2>
       {answers.length === 0 ? (
         <p className="text-zinc-400">No answers yet. Be the first to answer!</p>
       ) : (
