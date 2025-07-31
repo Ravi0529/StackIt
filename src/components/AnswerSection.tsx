@@ -68,27 +68,8 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
         throw new Error(response.data?.message || "Failed to fetch answers");
       }
 
-      const fetchedAnswers = Array.isArray(response.data.answers)
-        ? response.data.answers.map((answer: any) => ({
-            id: answer.id || "",
-            description: answer.description || "",
-            createdAt: answer.createdAt || new Date().toISOString(),
-            updatedAt: answer.updatedAt || new Date().toISOString(),
-            status: answer.status === "approved" ? "approved" : "pending",
-            user: {
-              id: answer.user?.id || "",
-              username: answer.user?.username || "Anonymous",
-              image: answer.user?.image || null,
-            },
-            commentCount:
-              typeof answer.commentCount === "number" ? answer.commentCount : 0,
-            upvotes: typeof answer.upvotes === "number" ? answer.upvotes : 0,
-            downvotes:
-              typeof answer.downvotes === "number" ? answer.downvotes : 0,
-          }))
-        : [];
-
-      setAnswers(fetchedAnswers);
+      // The API should return the complete answer data including vote counts
+      setAnswers(response.data.answers);
     } catch (error) {
       let errorMessage = "Failed to load answers";
       if (axios.isAxiosError(error)) {
@@ -280,6 +261,32 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
     } finally {
       setAnswerToModerate(null);
       setRejectDialogOpen(false);
+    }
+  };
+
+  const handleVote = async (answerId: string, voteType: "UP" | "DOWN") => {
+    try {
+      const response = await axios.post("/api/votes", {
+        answerId,
+        voteType,
+      });
+
+      if (response.data.success) {
+        setAnswers((prev) =>
+          prev.map((answer) =>
+            answer.id === answerId
+              ? {
+                  ...answer,
+                  upvotes: response.data.upvotes,
+                  downvotes: response.data.downvotes,
+                }
+              : answer
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Voting failed:", error);
+      toast.error("Failed to submit vote");
     }
   };
 
@@ -490,15 +497,21 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
             />
 
             <div className="flex flex-wrap items-center gap-4 mt-4 text-sm">
-              <span className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors">
+              <button
+                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors"
+                onClick={() => handleVote(answer.id, "UP")}
+              >
                 <ChevronUp className="h-5 w-5" />
                 <span>{answer.upvotes}</span>
-              </span>
+              </button>
 
-              <span className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors">
+              <button
+                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors"
+                onClick={() => handleVote(answer.id, "DOWN")}
+              >
                 <ChevronDown className="h-5 w-5" />
                 <span>{answer.downvotes}</span>
-              </span>
+              </button>
 
               <span className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors">
                 <MessageCircle className="h-5 w-5" />
@@ -509,7 +522,6 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
         ))
       )}
 
-      {/* Delete confirmation dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
           <AlertDialogHeader>
@@ -533,7 +545,6 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Accept confirmation dialog */}
       <AlertDialog open={acceptDialogOpen} onOpenChange={setAcceptDialogOpen}>
         <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
           <AlertDialogHeader>

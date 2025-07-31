@@ -12,4 +12,5 @@ export interface Answer {
   commentCount: number;
   upvotes: number;
   downvotes: number;
+  userVote?: "UP" | "DOWN" | null;
 }
