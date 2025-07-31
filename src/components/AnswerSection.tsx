@@ -124,6 +124,9 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
           answer.id === optimisticAnswerId
             ? {
                 ...response.data.answer,
+                commentCount: response.data.answer.commentCount || 0,
+                upvotes: response.data.answer.upvotes || 0,
+                downvotes: response.data.answer.downvotes || 0,
                 user: {
                   id: response.data.answer.user?.id || session.user.id,
                   username:
