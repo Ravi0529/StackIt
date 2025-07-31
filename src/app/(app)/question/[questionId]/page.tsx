@@ -302,7 +302,7 @@ export default function SingleQuestionDetails() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="p-1 h-auto w-auto text-white bg-[#1a1a1e] hover:bg-[#1a1a1e]"
+                        className="p-1 h-auto w-auto text-white hover:text-white bg-[#1a1a1e] hover:bg-[#1a1a1e]"
                       >
                         <MoreHorizontal className="h-5 w-5" />
                       </Button>

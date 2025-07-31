@@ -6,12 +6,36 @@ import { formatDistanceToNowStrict } from "date-fns";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Loader2, MessageCircle } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  MessageCircle,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { Tiptap } from "@/components/RichTextEditor/Tiptap";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { Answer } from "@/types/answer";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AnswerSectionProps {
   questionId: string;
@@ -24,6 +48,9 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
   const [description, setDescription] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [answerToDelete, setAnswerToDelete] = useState<string | null>(null);
   const { data: session } = useSession();
 
   const fetchAnswers = async () => {
@@ -103,55 +130,111 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
     };
 
     try {
-      setAnswers((prev) => [optimisticAnswer, ...prev]);
-      setIsExpanded(false);
-      setDescription("");
-
-      const response = await axios.post(
-        `/api/questions/${questionId}/answers`,
-        {
+      if (editingAnswer) {
+        const response = await axios.put(`/api/answers/${editingAnswer.id}`, {
           description,
-          userId: session.user.id,
+        });
+
+        if (!response.data?.answer) {
+          throw new Error("Invalid response format from server");
         }
-      );
 
-      if (!response.data?.answer) {
-        throw new Error("Invalid response format from server");
+        setAnswers((prev) =>
+          prev.map((answer) =>
+            answer.id === editingAnswer.id
+              ? {
+                  ...response.data.answer,
+                  commentCount: answer.commentCount,
+                  upvotes: answer.upvotes,
+                  downvotes: answer.downvotes,
+                  user: answer.user,
+                }
+              : answer
+          )
+        );
+        toast.success("Answer updated successfully!");
+        setIsExpanded(false);
+        setDescription("");
+        setEditingAnswer(null);
+      } else {
+        setAnswers((prev) => [optimisticAnswer, ...prev]);
+        setIsExpanded(false);
+        setDescription("");
+
+        const response = await axios.post(
+          `/api/questions/${questionId}/answers`,
+          {
+            description,
+            userId: session.user.id,
+          }
+        );
+
+        if (!response.data?.answer) {
+          throw new Error("Invalid response format from server");
+        }
+
+        setAnswers((prev) =>
+          prev.map((answer) =>
+            answer.id === optimisticAnswerId
+              ? {
+                  ...response.data.answer,
+                  commentCount: response.data.answer.commentCount || 0,
+                  upvotes: response.data.answer.upvotes || 0,
+                  downvotes: response.data.answer.downvotes || 0,
+                  user: {
+                    id: response.data.answer.user?.id || session.user.id,
+                    username:
+                      response.data.answer.user?.username ||
+                      session.user.username ||
+                      "",
+                    image:
+                      response.data.answer.user?.image ||
+                      session.user.image ||
+                      null,
+                  },
+                }
+              : answer
+          )
+        );
+        toast.success("Answer submitted! Awaiting approval.");
       }
-
-      setAnswers((prev) =>
-        prev.map((answer) =>
-          answer.id === optimisticAnswerId
-            ? {
-                ...response.data.answer,
-                commentCount: response.data.answer.commentCount || 0,
-                upvotes: response.data.answer.upvotes || 0,
-                downvotes: response.data.answer.downvotes || 0,
-                user: {
-                  id: response.data.answer.user?.id || session.user.id,
-                  username:
-                    response.data.answer.user?.username ||
-                    session.user.username ||
-                    "",
-                  image:
-                    response.data.answer.user?.image ||
-                    session.user.image ||
-                    null,
-                },
-              }
-            : answer
-        )
-      );
-
-      toast.success("Answer submitted! Awaiting approval.");
     } catch (error) {
-      setAnswers((prev) =>
-        prev.filter((answer) => answer.id !== optimisticAnswerId)
-      );
+      if (!editingAnswer) {
+        setAnswers((prev) =>
+          prev.filter((answer) => answer.id !== optimisticAnswerId)
+        );
+      }
       console.error(error);
-      toast.error("Failed to submit answer.");
+      toast.error(
+        editingAnswer ? "Failed to update answer" : "Failed to submit answer"
+      );
     } finally {
       setSubmitting(false);
+      setEditingAnswer(null);
+    }
+  };
+
+  const handleEdit = (answer: Answer) => {
+    setEditingAnswer(answer);
+    setDescription(answer.description);
+    setIsExpanded(true);
+  };
+
+  const handleDelete = async () => {
+    if (!answerToDelete) return;
+
+    try {
+      await axios.delete(`/api/answers/${answerToDelete}`);
+      setAnswers((prev) =>
+        prev.filter((answer) => answer.id !== answerToDelete)
+      );
+      toast.success("Answer deleted successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete answer");
+    } finally {
+      setAnswerToDelete(null);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -193,10 +276,14 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
           <Button
             variant="default"
             className="bg-blue-600 hover:bg-blue-700 px-5 py-2 text-sm"
-            onClick={() => setIsExpanded(true)}
+            onClick={() => {
+              setEditingAnswer(null);
+              setIsExpanded(true);
+            }}
           >
             <span className="flex items-center gap-1">
-              Write Your Answer <ChevronDown className="h-4 w-4" />
+              {editingAnswer ? "Edit Your Answer" : "Write Your Answer"}{" "}
+              <ChevronDown className="h-4 w-4" />
             </span>
           </Button>
         ) : (
@@ -211,13 +298,23 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                 className="bg-zinc-100 hover:bg-zinc-200 text-black text-sm px-4 py-2"
                 disabled={submitting}
               >
-                {submitting ? "Submitting..." : "Post Answer"}
+                {submitting
+                  ? editingAnswer
+                    ? "Updating..."
+                    : "Submitting..."
+                  : editingAnswer
+                  ? "Update Answer"
+                  : "Post Answer"}
               </Button>
 
               <Button
                 variant="secondary"
                 className="text-white bg-red-600 hover:bg-red-700"
-                onClick={() => setIsExpanded(false)}
+                onClick={() => {
+                  setIsExpanded(false);
+                  setEditingAnswer(null);
+                  setDescription("");
+                }}
               >
                 Cancel
               </Button>
@@ -278,6 +375,38 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                     </Badge>
                   )}
                 </div>
+
+                {session?.user?.id === answer.user?.id && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="h-8 w-8 p-0 ml-2 text-white hover:text-white bg-[#1a1a1e] hover:bg-[#1a1a1e]"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+                      <DropdownMenuItem
+                        className="cursor-pointer hover:bg-zinc-700 text-white font-medium"
+                        onClick={() => handleEdit(answer)}
+                      >
+                        <Pencil className="h-4 w-4 mr-2 text-white" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer text-red-500 hover:bg-red-500/10 font-medium"
+                        onClick={() => {
+                          setAnswerToDelete(answer.id);
+                          setDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2 text-red-500" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
 
@@ -305,6 +434,30 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
           </div>
         ))
       )}
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-700 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              answer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={handleDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
