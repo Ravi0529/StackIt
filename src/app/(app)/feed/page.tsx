@@ -14,27 +14,7 @@ import User from "../../../../assets/user.png";
 import { formatDistanceToNowStrict } from "date-fns";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-
-interface Question {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    id: string;
-    username: string;
-    image?: string;
-  };
-  tags: {
-    tag: {
-      name: string;
-    };
-  }[];
-  _count: {
-    answers: number;
-  };
-}
+import { Question } from "@/types/question";
 
 export default function Feed() {
   const router = useRouter();

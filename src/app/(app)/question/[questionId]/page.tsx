@@ -38,28 +38,9 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
-import AnswerInput from "@/components/AnswerInput";
-import AnswerDetails from "@/components/AnswerDetails";
 import { Separator } from "@/components/ui/separator";
-
-interface Question {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    image?: string | null;
-  };
-  tags: {
-    tag: {
-      name: string;
-    };
-  }[];
-}
+import { Question } from "@/types/question";
+import AnswerSection from "@/components/AnswerSection";
 
 export default function SingleQuestionDetails() {
   const params = useParams();
@@ -419,11 +400,7 @@ export default function SingleQuestionDetails() {
 
         <Separator />
 
-        <AnswerInput
-          questionId={question.id}
-          onAnswerSubmit={() => window.location.reload()}
-        />
-        <AnswerDetails questionId={question.id} />
+        <AnswerSection questionId={question.id} />
       </div>
     </div>
   );
