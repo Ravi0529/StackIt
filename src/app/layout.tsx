@@ -4,6 +4,7 @@ import AuthProvider from "@/context/AuthProvider";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +33,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <Navbar />
-          {children}
+          <NotificationProvider>
+            <Navbar />
+            {children}
+          </NotificationProvider>
           <Toaster richColors />
         </AuthProvider>
       </body>

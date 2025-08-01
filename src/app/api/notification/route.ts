@@ -27,7 +27,7 @@ export const GET = async (req: NextRequest) => {
 
     const notifications = await prisma.notification.findMany({
       where: {
-        receiverId: session.user.email,
+        receiverId: session.user.id,
         ...(isRead !== null && {
           isRead: isRead === "true",
         }),

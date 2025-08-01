@@ -12,6 +12,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { User } from "@prisma/client";
+import NotificationIcon from "./NotificationIcon";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -31,48 +32,51 @@ const Navbar = () => {
           </Link>
           <div className="flex items-center gap-3">
             {session ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-10 w-10 rounded-full p-0 border border-[#3a3a47] hover:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1] transition"
-                  >
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage
-                        src={(user as any)?.image || undefined}
-                        alt={user?.username || user?.email || "User"}
-                      />
-                      <AvatarFallback className="bg-[#1f1f29] text-white">
-                        {user?.username?.[0]?.toUpperCase() ||
-                          user?.email?.[0]?.toUpperCase() || (
-                            <UserIcon className="h-5 w-5" />
-                          )}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="bg-[#1a1a22] border border-[#2e2e3e] rounded-md text-white shadow-lg"
-                >
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href={`/profile/${user.id}`}
-                      className="flex items-center px-2 py-2 w-full hover:bg-[#2a2a36] rounded-sm transition"
+              <div className="flex items-center gap-4">
+                <NotificationIcon />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full p-0 border border-[#3a3a47] hover:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1] transition"
                     >
-                      <CreditCard className="mr-2 h-4 w-4 text-white" />
-                      <span className="font-medium">Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => signOut()}
-                    className="text-red-500 hover:bg-red-900/40 transition rounded-sm"
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage
+                          src={(user as any)?.image || undefined}
+                          alt={user?.username || user?.email || "User"}
+                        />
+                        <AvatarFallback className="bg-[#1f1f29] text-white">
+                          {user?.username?.[0]?.toUpperCase() ||
+                            user?.email?.[0]?.toUpperCase() || (
+                              <UserIcon className="h-5 w-5" />
+                            )}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-[#1a1a22] border border-[#2e2e3e] rounded-md text-white shadow-lg"
                   >
-                    <LogOut className="mr-2 h-4 w-4 text-red-500" />
-                    <span className="font-medium">Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`/profile/${user.id}`}
+                        className="flex items-center px-2 py-2 w-full hover:bg-[#2a2a36] rounded-sm transition"
+                      >
+                        <CreditCard className="mr-2 h-4 w-4 text-white" />
+                        <span className="font-medium">Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => signOut()}
+                      className="text-red-500 hover:bg-red-900/40 transition rounded-sm"
+                    >
+                      <LogOut className="mr-2 h-4 w-4 text-red-500" />
+                      <span className="font-medium">Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
               <Button
                 variant="default"

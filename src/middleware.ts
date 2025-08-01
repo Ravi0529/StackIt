@@ -31,6 +31,10 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 
+  if (!token && url.pathname.startsWith("/notification")) {
+    return NextResponse.redirect(new URL("/signin", req.url));
+  }
+
   return NextResponse.next();
 };
 
@@ -45,5 +49,6 @@ export const config = {
     "/feed/:path*",
     "/question/:path*",
     "/profile/:path*",
+    "/notification",
   ],
 };
