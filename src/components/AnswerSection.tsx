@@ -68,7 +68,6 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
         throw new Error(response.data?.message || "Failed to fetch answers");
       }
 
-      // The API should return the complete answer data including vote counts
       setAnswers(response.data.answers);
     } catch (error) {
       let errorMessage = "Failed to load answers";
