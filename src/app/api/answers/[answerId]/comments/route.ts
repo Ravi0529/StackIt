@@ -28,6 +28,7 @@ export const GET = async (
               select: {
                 id: true,
                 username: true,
+                image: true,
               },
             },
           },
@@ -40,7 +41,10 @@ export const GET = async (
 
     return NextResponse.json({
       success: true,
-      comments,
+      comments: comments.map((comment) => ({
+        ...comment,
+        mentions: comment.mentions.map((m) => m.mentionedUser),
+      })),
     });
   } catch (error) {
     console.error("Error fetching comments:", error);
