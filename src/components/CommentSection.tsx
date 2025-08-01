@@ -328,7 +328,25 @@ export default function CommentSection({
               </div>
 
               <p className="prose prose-invert max-w-none prose-sm break-words mt-2">
-                {comment.content}
+                {comment.content.split(/(@\w+)/g).map((part, i) => {
+                  if (part.startsWith("@")) {
+                    const username = part.substring(1);
+                    const isMentioned = comment.mentions?.some(
+                      (mention) => mention.username === username
+                    );
+                    return isMentioned ? (
+                      <span
+                        key={i}
+                        className="bg-blue-500/10 text-blue-400 px-1 rounded"
+                      >
+                        {part}
+                      </span>
+                    ) : (
+                      part
+                    );
+                  }
+                  return part;
+                })}
               </p>
             </div>
           ))}
