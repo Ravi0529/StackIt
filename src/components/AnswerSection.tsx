@@ -38,6 +38,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import CommentSection from "./CommentSection";
 
 interface AnswerSectionProps {
   questionId: string;
@@ -516,6 +517,20 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                 <span>{answer.commentCount}</span>
               </span>
             </div>
+
+            <CommentSection
+              answerId={answer.id}
+              questionId={questionId}
+              onCommentAdded={() => {
+                setAnswers((prev) =>
+                  prev.map((a) =>
+                    a.id === answer.id
+                      ? { ...a, commentCount: a.commentCount + 1 }
+                      : a
+                  )
+                );
+              }}
+            />
           </div>
         ))
       )}
