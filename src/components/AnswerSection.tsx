@@ -460,7 +460,6 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                 )}
               </div>
 
-              {/* Add this inside the answer div's header section */}
               {session?.user?.id !== answer.user?.id &&
                 answer.status === "pending" && (
                   <div className="flex gap-2 ml-auto">
