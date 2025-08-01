@@ -57,6 +57,9 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [answerToModerate, setAnswerToModerate] = useState<string | null>(null);
+  const [expandedComments, setExpandedComments] = useState<
+    Record<string, boolean>
+  >({});
   const { data: session } = useSession();
 
   const fetchAnswers = async () => {
@@ -512,25 +515,35 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                 <span>{answer.downvotes}</span>
               </button>
 
-              <span className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors">
+              <button
+                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors"
+                onClick={() =>
+                  setExpandedComments((prev) => ({
+                    ...prev,
+                    [answer.id]: !prev[answer.id],
+                  }))
+                }
+              >
                 <MessageCircle className="h-5 w-5" />
                 <span>{answer.commentCount}</span>
-              </span>
+              </button>
             </div>
 
-            <CommentSection
-              answerId={answer.id}
-              questionId={questionId}
-              onCommentAdded={() => {
-                setAnswers((prev) =>
-                  prev.map((a) =>
-                    a.id === answer.id
-                      ? { ...a, commentCount: a.commentCount + 1 }
-                      : a
-                  )
-                );
-              }}
-            />
+            {expandedComments[answer.id] && (
+              <CommentSection
+                answerId={answer.id}
+                questionId={questionId}
+                onCommentAdded={() => {
+                  setAnswers((prev) =>
+                    prev.map((a) =>
+                      a.id === answer.id
+                        ? { ...a, commentCount: a.commentCount + 1 }
+                        : a
+                    )
+                  );
+                }}
+              />
+            )}
           </div>
         ))
       )}

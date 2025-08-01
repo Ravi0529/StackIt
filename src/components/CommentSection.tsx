@@ -44,7 +44,6 @@ export default function CommentSection({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [content, setContent] = useState("");
-  const [isExpanded, setIsExpanded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
@@ -130,7 +129,6 @@ export default function CommentSection({
 
     try {
       setComments((prev) => [optimisticComment, ...prev]);
-      setIsExpanded(false);
       setContent("");
 
       const mentionedUsernames = Array.from(
@@ -239,55 +237,31 @@ export default function CommentSection({
   return (
     <div className="mt-6 border-t border-zinc-800 pt-6">
       <div className="mb-6">
-        {!isExpanded ? (
-          <Button
-            variant="ghost"
-            className="text-zinc-300 hover:text-white px-3 py-1 text-sm"
-            onClick={() => setIsExpanded(true)}
+        <div className="space-y-3">
+          <MentionsInput
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Write your comment..."
+            style={mentionStyle}
+            className="bg-zinc-900 border-zinc-700 text-white"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
           >
-            Add a comment
-          </Button>
-        ) : (
-          <div className="space-y-3">
-            <MentionsInput
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your comment..."
-              style={mentionStyle}
-              className="bg-zinc-900 border-zinc-700 text-white"
-            >
-              <Mention
-                trigger="@"
-                data={mentionSuggestions}
-                displayTransform={(id, display) => `@${display}`}
-                markup="@__display__"
-              />
-            </MentionsInput>
-
-            <div className="flex gap-2">
-              <Button
-                onClick={handleSubmit}
-                className="bg-zinc-100 hover:bg-zinc-200 text-black text-sm px-3 py-1"
-                disabled={submitting}
-              >
-                {submitting ? "Posting..." : "Post Comment"}
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-zinc-300 hover:text-white"
-                onClick={() => {
-                  setIsExpanded(false);
-                  setContent("");
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        )}
+            <Mention
+              trigger="@"
+              data={mentionSuggestions}
+              displayTransform={(id, display) => `@${display}`}
+              markup="@__display__"
+            />
+          </MentionsInput>
+        </div>
       </div>
 
-      {comments.length === 0 && !isExpanded ? (
+      {comments.length === 0 ? (
         <p className="text-zinc-500 text-sm">No comments yet.</p>
       ) : (
         <div className="space-y-4">
@@ -332,20 +306,20 @@ export default function CommentSection({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 p-0 text-zinc-400 hover:text-white"
+                        className="h-7 w-7 p-0 text-zinc-400 hover:text-white hover:bg-transparent"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-zinc-800 border-zinc-700 w-40">
                       <DropdownMenuItem
-                        className="text-red-500 hover:bg-red-500/10 focus:text-red-500"
+                        className="text-red-500 hover:bg-red-500/10 focus:text-red-500 font-medium"
                         onClick={() => {
                           setCommentToDelete(comment.id);
                           setDeleteDialogOpen(true);
                         }}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
+                        <Trash2 className="h-4 w-4 mr-2 text-red-500" />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -371,7 +345,7 @@ export default function CommentSection({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700">
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white hover:text-white">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
