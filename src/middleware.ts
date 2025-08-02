@@ -15,23 +15,23 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.redirect(new URL("/feed", req.url));
   }
 
-  if (url.pathname === "/feed") {
-    return NextResponse.next();
+  if (url.pathname.startsWith("/admin")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/signin", req.url));
+    }
+
+    if (token.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
   }
 
-  if (!token && url.pathname.startsWith("/feed/")) {
-    return NextResponse.redirect(new URL("/signin", req.url));
-  }
-
-  if (!token && url.pathname.startsWith("/question/")) {
-    return NextResponse.redirect(new URL("/signin", req.url));
-  }
-
-  if (!token && url.pathname.startsWith("/profile/")) {
-    return NextResponse.redirect(new URL("/signin", req.url));
-  }
-
-  if (!token && url.pathname.startsWith("/notification")) {
+  if (
+    !token &&
+    (url.pathname.startsWith("/feed/") ||
+      url.pathname.startsWith("/question/") ||
+      url.pathname.startsWith("/profile/") ||
+      url.pathname.startsWith("/notification"))
+  ) {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 
@@ -50,5 +50,6 @@ export const config = {
     "/question/:path*",
     "/profile/:path*",
     "/notification",
+    "/admin/:path*",
   ],
 };

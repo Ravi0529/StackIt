@@ -2,7 +2,12 @@
 
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { LogOut, CreditCard, User as UserIcon } from "lucide-react";
+import {
+  LogOut,
+  CreditCard,
+  User as UserIcon,
+  LayoutDashboard,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -17,6 +22,7 @@ import NotificationIcon from "./NotificationIcon";
 const Navbar = () => {
   const { data: session } = useSession();
   const user: User = session?.user as User;
+  const isAdmin = user?.role === "ADMIN";
 
   return (
     <nav className="sticky top-0 z-30 w-full bg-[#0f0f11] border-b border-[#2a2a36] shadow-md font-sans">
@@ -58,6 +64,17 @@ const Navbar = () => {
                     align="end"
                     className="bg-[#1a1a22] border border-[#2e2e3e] rounded-md text-white shadow-lg"
                   >
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/admin/dashboard"
+                          className="flex items-center px-2 py-2 w-full hover:bg-[#2a2a36] rounded-sm transition"
+                        >
+                          <LayoutDashboard className="mr-2 h-4 w-4 text-white" />
+                          <span className="font-medium">Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <Link
                         href={`/profile/${user.id}`}
