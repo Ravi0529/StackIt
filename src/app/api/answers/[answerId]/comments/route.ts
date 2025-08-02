@@ -132,7 +132,7 @@ export const POST = async (
           senderId: user.id,
           receiverId: mentionedUserId,
           type: "MENTIONED",
-          message: `${user.username} mentioned you in a comment`,
+          message: "You have been mentioned in a comment",
         })),
       });
     }

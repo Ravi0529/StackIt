@@ -130,7 +130,7 @@ export const PUT = async (
           senderId: currentUser.id,
           receiverId: updatedAnswer.question.userId,
           type: "ANSWERED",
-          message: `Your question has an updated answer from ${session.user.username}`,
+          message: "Your question has an updated answer.",
         },
       });
     }

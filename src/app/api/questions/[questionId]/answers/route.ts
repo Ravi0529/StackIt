@@ -156,7 +156,7 @@ export const POST = async (
           senderId: userId,
           receiverId: question.userId,
           type: "ANSWERED",
-          message: "Someone answered your question.",
+          message: "Added answer to your question.",
         },
       });
     }
