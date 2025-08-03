@@ -51,5 +51,6 @@ export const config = {
     "/profile/:path*",
     "/notification",
     "/admin/:path*",
+    "/search/:path*",
   ],
 };

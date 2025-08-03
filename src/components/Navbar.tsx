@@ -2,11 +2,13 @@
 
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   LogOut,
   CreditCard,
   User as UserIcon,
   LayoutDashboard,
+  Search,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -21,6 +23,7 @@ import NotificationIcon from "./NotificationIcon";
 
 const Navbar = () => {
   const { data: session } = useSession();
+  const router = useRouter();
   const user: User = session?.user as User;
   const isAdmin = user?.role === "ADMIN";
 
@@ -39,6 +42,16 @@ const Navbar = () => {
           <div className="flex items-center gap-3">
             {session ? (
               <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  className="rounded-md hover:bg-[#0f0f11] cursor-pointer text-gray-300 hover:text-white transition flex items-center gap-2 px-3"
+                  onClick={() => router.push("/search")}
+                  aria-label="Search"
+                >
+                  <Search className="h-5 w-5" />
+                  <span className="hidden sm:inline">Search</span>
+                </Button>
+
                 <NotificationIcon />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -95,14 +108,25 @@ const Navbar = () => {
                 </DropdownMenu>
               </div>
             ) : (
-              <Button
-                variant="default"
-                asChild
-                size="lg"
-                className="px-5 text-sm font-semibold bg-zinc-100 text-black hover:bg-zinc-200 transition font-sans"
-              >
-                <Link href="/signin">Login</Link>
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  className="rounded-md hover:bg-[#0f0f11] cursor-pointer text-gray-300 hover:text-white transition flex items-center gap-2 px-3"
+                  onClick={() => router.push("/search")}
+                  aria-label="Search"
+                >
+                  <Search className="h-5 w-5" />
+                  <span className="hidden sm:inline">Search</span>
+                </Button>
+                <Button
+                  variant="default"
+                  asChild
+                  size="lg"
+                  className="px-5 text-sm font-semibold bg-zinc-100 text-black hover:bg-zinc-200 transition font-sans"
+                >
+                  <Link href="/signin">Login</Link>
+                </Button>
+              </>
             )}
           </div>
         </div>
