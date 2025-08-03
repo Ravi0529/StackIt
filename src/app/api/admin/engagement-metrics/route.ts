@@ -3,6 +3,16 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
+interface TagWithCount {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  _count: {
+    questions: number;
+  };
+}
+
 export const GET = async () => {
   try {
     const session = await getServerSession(authOptions);
@@ -19,7 +29,7 @@ export const GET = async () => {
       );
     }
 
-    const topTags = await prisma.tag.findMany({
+    const topTags: TagWithCount[] = await prisma.tag.findMany({
       take: 5,
       orderBy: {
         questions: {
@@ -48,7 +58,7 @@ export const GET = async () => {
 
     return NextResponse.json({
       success: true,
-      topTags: topTags.map((tag) => ({
+      topTags: topTags.map((tag: TagWithCount) => ({
         name: tag.name,
         questionCount: tag._count.questions,
       })),
