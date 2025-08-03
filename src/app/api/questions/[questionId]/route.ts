@@ -4,10 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import prisma from "@/lib/prisma";
 
 // GET single question by ID
-export const GET = async (
-  req: NextRequest,
-  { params }: { params: { questionId: string } }
-) => {
+export const GET = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
 
@@ -23,7 +20,9 @@ export const GET = async (
     );
   }
 
-  const { questionId } = await params;
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const questionId = pathSegments[pathSegments.indexOf("questions") + 1];
 
   if (!questionId) {
     return NextResponse.json(
@@ -95,10 +94,7 @@ export const GET = async (
 };
 
 // PUT particular question by ID
-export const PUT = async (
-  req: NextRequest,
-  { params }: { params: { questionId: string } }
-) => {
+export const PUT = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
 
@@ -114,7 +110,9 @@ export const PUT = async (
     );
   }
 
-  const { questionId } = await params;
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const questionId = pathSegments[pathSegments.indexOf("questions") + 1];
 
   if (!questionId) {
     return NextResponse.json(
@@ -241,10 +239,7 @@ export const PUT = async (
 };
 
 // DELETE particular question by ID
-export const DELETE = async (
-  req: NextRequest,
-  { params }: { params: { questionId: string } }
-) => {
+export const DELETE = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
   const user: User = session?.user as User;
 
@@ -260,7 +255,9 @@ export const DELETE = async (
     );
   }
 
-  const { questionId } = await params;
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const questionId = pathSegments[pathSegments.indexOf("questions") + 1];
 
   if (!questionId) {
     return NextResponse.json(

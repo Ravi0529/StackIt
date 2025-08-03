@@ -3,11 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 // GET all the answers of the particular question
-export const GET = async (
-  req: NextRequest,
-  { params }: { params: { questionId: string } }
-) => {
-  const { questionId } = await params;
+export const GET = async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const questionId = pathSegments[pathSegments.indexOf("questions") + 1];
 
   if (!questionId) {
     return NextResponse.json(
@@ -85,11 +84,10 @@ export const GET = async (
 };
 
 // POST a new answer on particular question
-export const POST = async (
-  req: NextRequest,
-  { params }: { params: { questionId: string } }
-) => {
-  const { questionId } = await params;
+export const POST = async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const questionId = pathSegments[pathSegments.indexOf("questions") + 1];
 
   if (!questionId) {
     return NextResponse.json(

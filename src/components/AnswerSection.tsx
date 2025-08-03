@@ -294,8 +294,37 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await axios.get(
+          `/api/questions/${questionId}/answers`
+        );
+        if (!response.data?.success) {
+          throw new Error(response.data?.message || "Failed to fetch answers");
+        }
+
+        setAnswers(response.data.answers);
+      } catch (error) {
+        let errorMessage = "Failed to load answers";
+        if (axios.isAxiosError(error)) {
+          errorMessage =
+            error.response?.data?.message || error.message || errorMessage;
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        setError(errorMessage);
+        toast.error(errorMessage);
+        console.error("Error fetching answers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (questionId) {
-      fetchAnswers();
+      fetchData();
     }
   }, [questionId]);
 
@@ -532,7 +561,6 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
             {expandedComments[answer.id] && (
               <CommentSection
                 answerId={answer.id}
-                questionId={questionId}
                 onCommentAdded={() => {
                   setAnswers((prev) =>
                     prev.map((a) =>

@@ -160,7 +160,7 @@ export default function SignInPage() {
               Sign In
             </Button>
             <div className="text-sm text-center text-muted-foreground">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup" className="underline hover:text-white">
                 Sign up
               </Link>

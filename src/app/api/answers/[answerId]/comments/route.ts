@@ -3,11 +3,10 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-export const GET = async (
-  req: NextRequest,
-  { params }: { params: { answerId: string } }
-) => {
-  const { answerId } = await params;
+export const GET = async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const answerId = pathSegments[pathSegments.indexOf("answers") + 1];
 
   try {
     const comments = await prisma.comment.findMany({
@@ -60,10 +59,7 @@ export const GET = async (
   }
 };
 
-export const POST = async (
-  req: NextRequest,
-  { params }: { params: { answerId: string } }
-) => {
+export const POST = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
   if (!session?.user.email) {
     return NextResponse.json(
@@ -77,7 +73,9 @@ export const POST = async (
     );
   }
 
-  const { answerId } = await params;
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const answerId = pathSegments[pathSegments.indexOf("answers") + 1];
   const { content, mentionedUserIds = [] } = await req.json();
 
   if (!content) {

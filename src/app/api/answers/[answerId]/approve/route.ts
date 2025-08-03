@@ -4,10 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import prisma from "@/lib/prisma";
 
-export const PUT = async (
-  req: NextRequest,
-  { params }: { params: { answerId: string } }
-) => {
+export const PUT = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
@@ -21,7 +18,9 @@ export const PUT = async (
     );
   }
 
-  const { answerId } = await params;
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const answerId = pathSegments[pathSegments.indexOf("answers") + 1];
 
   if (!answerId) {
     return NextResponse.json(

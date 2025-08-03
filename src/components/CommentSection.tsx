@@ -31,19 +31,24 @@ import { Comment } from "@/types/comment";
 
 interface CommentSectionProps {
   answerId: string;
-  questionId: string;
   onCommentAdded?: () => void;
+}
+
+interface MentionableUser {
+  id: string;
+  username: string;
+  image?: string | null;
 }
 
 export default function CommentSection({
   answerId,
-  questionId,
   onCommentAdded,
 }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [content, setContent] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [submitting, setSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
@@ -79,25 +84,44 @@ export default function CommentSection({
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const [commentsRes, usersRes] = await Promise.all([
+          axios.get(`/api/answers/${answerId}/comments`),
+          axios.get<{ users: MentionableUser[] }>(
+            `/api/answers/${answerId}/mentionable-users`
+          ),
+        ]);
+
+        if (!commentsRes.data?.success) {
+          throw new Error(
+            commentsRes.data?.message || "Failed to fetch comments"
+          );
+        }
+
+        setComments(commentsRes.data.comments);
+
+        const users = usersRes.data.users || [];
+        setMentionSuggestions(
+          users.map((u) => ({
+            id: u.id,
+            display: u.username,
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (answerId) {
-      fetchComments();
-      fetchMentionableUsers();
+      fetchData();
     }
   }, [answerId]);
-
-  const fetchMentionableUsers = async () => {
-    try {
-      const res = await axios.get(`/api/answers/${answerId}/mentionable-users`);
-      const users = res.data.users || [];
-      const formatted = users.map((u: any) => ({
-        id: u.id,
-        display: u.username,
-      }));
-      setMentionSuggestions(formatted);
-    } catch (err) {
-      console.error("Failed to fetch mentionable users", err);
-    }
-  };
 
   const handleSubmit = async () => {
     if (!content.trim()) {
@@ -204,12 +228,6 @@ export default function CommentSection({
       setDeleteDialogOpen(false);
     }
   };
-
-  useEffect(() => {
-    if (answerId) {
-      fetchComments();
-    }
-  }, [answerId]);
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -16,12 +16,12 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Question } from "@/types/question";
 
-export default function Feed() {
+function FeedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1");
 
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const isAuthenticated = status === "authenticated";
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -181,5 +181,19 @@ export default function Feed() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Feed() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-40">
+          <Loader2 className="animate-spin h-6 w-6 text-white" />
+        </div>
+      }
+    >
+      <FeedContent />
+    </Suspense>
   );
 }

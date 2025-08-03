@@ -13,13 +13,22 @@ import Image from "next/image";
 import User from "../../../../../assets/user.png";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { Question } from "@/types/question";
+
+interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  image: string | null;
+  questions: Question[];
+}
 
 export default function ProfilePage() {
-  const { userId } = useParams();
+  const { userId } = useParams<{ userId: string }>();
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   function stripAndTrimDescription(html: string, wordLimit: number): string {
@@ -34,18 +43,27 @@ export default function ProfilePage() {
     async function fetchUser() {
       let targetUserId = userId;
       if (userId === "me") {
-        if (!session?.user?.id) return setLoading(false);
+        if (!session?.user?.id) {
+          setLoading(false);
+          return;
+        }
         targetUserId = session.user.id;
       }
 
       try {
-        const response = await axios.get(`/api/profile/${targetUserId}`);
+        const response = await axios.get<{
+          success: boolean;
+          user: UserProfile;
+          message?: string;
+        }>(`/api/profile/${targetUserId}`);
+
         if (response.data.success) {
           setUser(response.data.user);
         } else {
           toast.error(response.data.message || "Failed to load user profile");
         }
-      } catch (error) {
+      } catch (err) {
+        console.error(err);
         toast.error("Failed to load user profile");
       } finally {
         setLoading(false);
@@ -65,10 +83,11 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user)
+  if (!user) {
     return (
       <p className="p-4 text-red-500">User not found or an error occurred.</p>
     );
+  }
 
   return (
     <div className="min-h-screen bg-[#1a1a1e] text-white px-4 py-10 font-sans">
@@ -117,7 +136,7 @@ export default function ProfilePage() {
           {user.questions.length === 0 ? (
             <p className="text-muted-foreground">No questions asked yet.</p>
           ) : (
-            user.questions.map((q: any) => (
+            user.questions.map((q) => (
               <Card
                 key={q.id}
                 className="bg-zinc-900 border-zinc-700 text-white hover:border-zinc-500 cursor-pointer transition"
@@ -130,7 +149,7 @@ export default function ProfilePage() {
                     {stripAndTrimDescription(q.description, 20)}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {q.tags.map((tag: any) => (
+                    {q.tags.map((tag) => (
                       <Badge
                         key={tag.tag.name}
                         className="bg-blue-600/30 text-blue-300 border border-blue-500"

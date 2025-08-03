@@ -61,7 +61,7 @@ const Navbar = () => {
                     >
                       <Avatar className="h-9 w-9">
                         <AvatarImage
-                          src={(user as any)?.image || undefined}
+                          src={user?.image || undefined}
                           alt={user?.username || user?.email || "User"}
                         />
                         <AvatarFallback className="bg-[#1f1f29] text-white">

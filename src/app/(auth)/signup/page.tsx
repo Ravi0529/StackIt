@@ -31,21 +31,17 @@ export default function SignUpPage() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/api/signup", {
+      await axios.post("/api/signup", {
         username,
         email: emailAddress,
         password,
       });
       toast.success("Signed up successfully!");
       router.push("/feed");
-    } catch (err: any) {
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-        toast.error(err.response.data.error);
-      } else {
-        setError("Something went wrong. Please try again.");
-        toast.error("Something went wrong. Please try again.");
-      }
+    } catch (error) {
+      console.error(error);
+      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

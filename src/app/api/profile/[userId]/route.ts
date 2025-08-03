@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export const GET = async (
-  req: NextRequest,
-  { params }: { params: { userId: string } }
-) => {
+export const GET = async (req: NextRequest) => {
   try {
-    const { userId } = await params;
+    const url = new URL(req.url);
+    const pathSegments = url.pathname.split("/");
+    const userId = pathSegments[pathSegments.indexOf("profile") + 1];
 
     const user = await prisma.user.findUnique({
       where: {

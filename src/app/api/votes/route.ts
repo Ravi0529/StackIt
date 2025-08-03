@@ -57,11 +57,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    let vote;
-
     if (existingVote) {
       if (existingVote.type === voteType) {
-        vote = await prisma.vote.delete({
+        await prisma.vote.delete({
           where: {
             userId_answerId: {
               userId: user.id,
@@ -70,7 +68,7 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
-        vote = await prisma.vote.update({
+        await prisma.vote.update({
           where: {
             userId_answerId: {
               userId: user.id,
@@ -83,7 +81,7 @@ export async function POST(req: NextRequest) {
         });
       }
     } else {
-      vote = await prisma.vote.create({
+      await prisma.vote.create({
         data: {
           userId: user.id,
           answerId,

@@ -3,10 +3,7 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 
-export const DELETE = async (
-  req: NextRequest,
-  { params }: { params: { commentId: string } }
-) => {
+export const DELETE = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
 
   if (!session?.user.email) {
@@ -21,7 +18,9 @@ export const DELETE = async (
     );
   }
 
-  const { commentId } = await params;
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const commentId = pathSegments[pathSegments.indexOf("answers") + 1];
 
   try {
     const user = await prisma.user.findUnique({

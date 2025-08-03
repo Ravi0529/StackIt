@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -37,12 +36,45 @@ import { formatDistanceToNowStrict } from "date-fns";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
+interface ContentStats {
+  totalQuestions: number;
+  totalAnswers: number;
+  totalComments: number;
+  unansweredQuestions: number;
+  approvalRate: number;
+}
+
+interface EngagementMetrics {
+  votingActivity: {
+    upvotes: number;
+    downvotes: number;
+  };
+  topTags: {
+    name: string;
+    questionCount: number;
+  }[];
+}
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  _count: {
+    questions: number;
+    answers: number;
+    comments: number;
+  };
+}
+
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [contentStats, setContentStats] = useState<any>(null);
-  const [engagementMetrics, setEngagementMetrics] = useState<any>(null);
-  const [users, setUsers] = useState<any[]>([]);
+  const [contentStats, setContentStats] = useState<ContentStats | null>(null);
+  const [engagementMetrics, setEngagementMetrics] =
+    useState<EngagementMetrics | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,17 +82,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === "loading") return;
 
-    if (
-      !session?.user ||
-      (session.user as { role?: string })?.role !== "ADMIN"
-    ) {
+    if (!session?.user || session.user.role !== "ADMIN") {
       router.push("/");
       return;
     }
   }, [session, status, router]);
 
   useEffect(() => {
-    if ((session?.user as any)?.role !== "ADMIN") return;
+    if (session?.user?.role !== "ADMIN") return;
 
     const fetchData = async () => {
       try {
@@ -68,9 +97,9 @@ export default function AdminDashboard() {
         setError(null);
 
         const [statsRes, metricsRes, usersRes] = await Promise.all([
-          axios.get("/api/admin/content-stats"),
-          axios.get("/api/admin/engagement-metrics"),
-          axios.get("/api/admin/users"),
+          axios.get<ContentStats>("/api/admin/content-stats"),
+          axios.get<EngagementMetrics>("/api/admin/engagement-metrics"),
+          axios.get<{ users: User[] }>("/api/admin/users"),
         ]);
 
         setContentStats(statsRes.data);
@@ -318,7 +347,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {engagementMetrics.topTags.map((tag: any) => (
+                  {engagementMetrics.topTags.map((tag) => (
                     <Badge
                       key={tag.name}
                       className="bg-blue-600/30 text-blue-300 border border-blue-500 hover:bg-blue-600/40"

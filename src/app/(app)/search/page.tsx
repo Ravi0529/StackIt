@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import Link from "next/link";
 import { Question } from "@/types/question";
 import axios from "axios";
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -28,32 +28,32 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const page = parseInt(searchParams.get("page") || "1");
 
-  const fetchSearchResults = async () => {
-    if (!query.trim()) {
-      setQuestions([]);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `/api/search?q=${encodeURIComponent(
-          query
-        )}&type=${searchType}&page=${page}`
-      );
-      const { questions, totalPages } = response.data;
-      setQuestions(questions);
-      setTotalPages(totalPages);
-    } catch (error) {
-      toast.error("Failed to fetch search results");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchSearchResults();
+    const fetchData = async () => {
+      if (!query.trim()) {
+        setQuestions([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `/api/search?q=${encodeURIComponent(
+            query
+          )}&type=${searchType}&page=${page}`
+        );
+        const { questions, totalPages } = response.data;
+        setQuestions(questions);
+        setTotalPages(totalPages);
+      } catch (error) {
+        toast.error("Failed to fetch search results");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [query, searchType, page]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -166,7 +166,7 @@ export default function SearchPage() {
 
           {query && (
             <p className="text-gray-400">
-              Showing results for "{query}" in{" "}
+              Showing results for &quot;{query}&quot; in{" "}
               {searchType === "all" ? "all fields" : searchType}
             </p>
           )}
@@ -280,5 +280,19 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-40">
+          <Loader2 className="animate-spin h-6 w-6 text-white" />
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
   );
 }

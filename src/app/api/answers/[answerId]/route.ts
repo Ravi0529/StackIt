@@ -4,11 +4,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import prisma from "@/lib/prisma";
 
-export const PUT = async (
-  req: NextRequest,
-  { params }: { params: { answerId: string } }
-) => {
-  const { answerId } = await params;
+export const PUT = async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const answerId = pathSegments[pathSegments.indexOf("answers") + 1];
 
   if (!answerId) {
     return NextResponse.json(
@@ -154,11 +153,10 @@ export const PUT = async (
   }
 };
 
-export const DELETE = async (
-  req: NextRequest,
-  { params }: { params: { answerId: string } }
-) => {
-  const { answerId } = await params;
+export const DELETE = async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const answerId = pathSegments[pathSegments.indexOf("answers") + 1];
 
   if (!answerId) {
     return NextResponse.json(

@@ -85,6 +85,7 @@ export default function SingleQuestionDetails() {
           setEditDescription(q.description);
         }
       } catch (error) {
+        console.error(error);
         setError("Failed to load question.");
       } finally {
         setLoading(false);
@@ -105,6 +106,7 @@ export default function SingleQuestionDetails() {
         toast.error(response.data.message || "Deletion failed");
       }
     } catch (error) {
+      console.error(error);
       toast.error("Something went wrong while deleting.");
     }
   };
@@ -154,6 +156,16 @@ export default function SingleQuestionDetails() {
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>Question not found.</AlertDescription>
       </Alert>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#1a1a1e] text-white px-4 py-10 font-sans">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12 text-red-500">{error}</div>
+        </div>
+      </div>
     );
   }
 

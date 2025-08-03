@@ -14,16 +14,22 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials: any) => {
+      authorize: async (credentials) => {
         try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email and password are required");
+          }
+
           const user = await prisma.user.findUnique({
-            where: { email: credentials?.email },
+            where: { email: credentials.email },
           });
 
-          if (!user) throw new Error("Incorrect email or password");
+          if (!user || !user.password) {
+            throw new Error("Incorrect email or password");
+          }
 
           const isPasswordCorrect = await bcrypt.compare(
-            credentials?.password,
+            credentials.password,
             user.password
           );
 
@@ -31,9 +37,16 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Incorrect email or password");
           }
 
-          return user;
-        } catch (error: any) {
-          throw new Error(error.message || "Login failed");
+          return {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            image: user.image,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error(error);
+          throw new Error("Login failed");
         }
       },
     }),

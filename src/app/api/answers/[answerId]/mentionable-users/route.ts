@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export const GET = async (
-  req: NextRequest,
-  { params }: { params: { answerId: string } }
-) => {
-  const { answerId } = await params;
+export const GET = async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const pathSegments = url.pathname.split("/");
+  const answerId = pathSegments[pathSegments.indexOf("answers") + 1];
 
   try {
     const answer = await prisma.answer.findUnique({
