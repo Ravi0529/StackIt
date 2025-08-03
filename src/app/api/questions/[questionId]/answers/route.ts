@@ -2,6 +2,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+interface User {
+  id: string;
+  username: string;
+  image: string | null;
+}
+
+interface Vote {
+  type: "UP" | "DOWN";
+}
+
+interface AnswerWithRelations {
+  id: string;
+  description: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: User;
+  comments: { id: string }[];
+  votes: Vote[];
+}
+
 // GET all the answers of the particular question
 export const GET = async (req: NextRequest) => {
   const url = new URL(req.url);
@@ -21,7 +42,7 @@ export const GET = async (req: NextRequest) => {
   }
 
   try {
-    const answers = await prisma.answer.findMany({
+    const answers: AnswerWithRelations[] = await prisma.answer.findMany({
       where: {
         questionId,
       },
@@ -42,7 +63,7 @@ export const GET = async (req: NextRequest) => {
       },
     });
 
-    const formattedAnswers = answers.map((answer) => {
+    const formattedAnswers = answers.map((answer: AnswerWithRelations) => {
       const upvotes = answer.votes.filter((v) => v.type === "UP").length;
       const downvotes = answer.votes.filter((v) => v.type === "DOWN").length;
 
