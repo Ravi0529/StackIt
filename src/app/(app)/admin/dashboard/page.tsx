@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { ArrowLeftCircle, Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -134,6 +134,15 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[#1a1a1e] text-white px-4 py-10 font-sans">
       <div className="max-w-7xl mx-auto">
+        <div className="mb-10">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center text-sm text-gray-400 hover:text-white transition"
+          >
+            <ArrowLeftCircle className="h-4 w-4 mr-2" />
+            Back
+          </button>
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -146,7 +155,6 @@ export default function AdminDashboard() {
           <p className="text-gray-400">Manage and monitor platform activity</p>
         </motion.div>
 
-        {/* Stats Overview */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -201,7 +209,6 @@ export default function AdminDashboard() {
           </Card>
         </motion.div>
 
-        {/* Charts Section */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -298,7 +305,6 @@ export default function AdminDashboard() {
           </Card>
         </motion.div>
 
-        {/* Top Tags Section */}
         {engagementMetrics?.topTags && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -326,7 +332,6 @@ export default function AdminDashboard() {
           </motion.div>
         )}
 
-        {/* Users Table */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
