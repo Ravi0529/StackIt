@@ -3,13 +3,34 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
+interface User {
+  id: string;
+  username: string;
+  image: string | null;
+}
+
+interface Mention {
+  mentionedUser: User;
+}
+
+interface CommentWithRelations {
+  id: string;
+  content: string;
+  userId: string;
+  answerId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: User;
+  mentions: Mention[];
+}
+
 export const GET = async (req: NextRequest) => {
   const url = new URL(req.url);
   const pathSegments = url.pathname.split("/");
   const answerId = pathSegments[pathSegments.indexOf("answers") + 1];
 
   try {
-    const comments = await prisma.comment.findMany({
+    const comments: CommentWithRelations[] = await prisma.comment.findMany({
       where: {
         answerId,
       },
@@ -40,9 +61,9 @@ export const GET = async (req: NextRequest) => {
 
     return NextResponse.json({
       success: true,
-      comments: comments.map((comment) => ({
+      comments: comments.map((comment: CommentWithRelations) => ({
         ...comment,
-        mentions: comment.mentions.map((m) => m.mentionedUser),
+        mentions: comment.mentions.map((m: Mention) => m.mentionedUser),
       })),
     });
   } catch (error) {
