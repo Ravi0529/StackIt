@@ -18,8 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { User } from "@prisma/client";
 import NotificationIcon from "./NotificationIcon";
+import { User } from "next-auth";
 
 const Navbar = () => {
   const { data: session } = useSession();
