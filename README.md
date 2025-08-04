@@ -247,26 +247,6 @@ The application can be deployed to any platform that supports Next.js:
 - **DigitalOcean App Platform**
 - **AWS Amplify**
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow TypeScript best practices
-- Use conventional commit messages
-- Write meaningful commit descriptions
-- Test your changes thoroughly
-- Update documentation as needed
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 👥 Team
 
 - **Ravi Mistry** - [mistryravi051005@gmail.com](mailto:mistryravi051005@gmail.com)
