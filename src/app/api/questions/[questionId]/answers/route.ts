@@ -21,6 +21,7 @@ interface AnswerWithRelations {
   user: User;
   comments: { id: string }[];
   votes: Vote[];
+  question: { userId: string };
 }
 
 // GET all the answers of the particular question
@@ -60,6 +61,11 @@ export const GET = async (req: NextRequest) => {
           },
         },
         votes: true,
+        question: {
+          select: {
+            userId: true,
+          },
+        },
       },
     });
 
@@ -74,6 +80,7 @@ export const GET = async (req: NextRequest) => {
         createdAt: answer.createdAt,
         updatedAt: answer.updatedAt,
         user: answer.user,
+        question: answer.question,
         commentCount: answer.comments.length,
         upvotes,
         downvotes,

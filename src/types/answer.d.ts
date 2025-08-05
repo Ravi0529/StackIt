@@ -13,4 +13,7 @@ export interface Answer {
   upvotes: number;
   downvotes: number;
   userVote?: "UP" | "DOWN" | null;
+  question?: {
+    userId: string;
+  };
 }

@@ -493,7 +493,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                 )}
               </div>
 
-              {session?.user?.id !== answer.user?.id &&
+              {session?.user?.id === answer.question?.userId &&
                 answer.status === "pending" && (
                   <div className="flex gap-2 ml-auto">
                     <Button
@@ -545,7 +545,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
               </button>
 
               <button
-                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors"
+                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                 onClick={() =>
                   setExpandedComments((prev) => ({
                     ...prev,
