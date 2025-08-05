@@ -105,7 +105,7 @@ export default function Notification() {
         <p className="text-red-400">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+          className="mt-4 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 cursor-pointer"
         >
           Retry
         </button>
@@ -119,7 +119,7 @@ export default function Notification() {
         <div>
           <button
             onClick={() => router.back()}
-            className="flex items-center text-sm text-gray-400 hover:text-white transition"
+            className="flex items-center text-sm text-gray-400 hover:text-white transition cursor-pointer"
           >
             <ArrowLeftCircle className="h-4 w-4 mr-2" />
             Back

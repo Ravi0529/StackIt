@@ -161,7 +161,7 @@ function FeedContent() {
                 variant="outline"
                 onClick={() => goToPage(page - 1)}
                 disabled={page <= 1}
-                className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700"
+                className="bg-zinc-800 border-zinc-600 cursor-pointer text-white hover:bg-zinc-700"
               >
                 Previous
               </Button>
@@ -172,7 +172,7 @@ function FeedContent() {
                 variant="outline"
                 onClick={() => goToPage(page + 1)}
                 disabled={page >= totalPages}
-                className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700"
+                className="bg-zinc-800 border-zinc-600 cursor-pointer text-white hover:bg-zinc-700"
               >
                 Next
               </Button>

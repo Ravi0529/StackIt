@@ -57,7 +57,7 @@ const Navbar = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full p-0 border border-[#3a3a47] hover:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1] transition"
+                      className="relative h-10 w-10 rounded-full p-0 border border-[#3a3a47] hover:border-[#6366f1] focus:outline-none focus:ring-2 focus:ring-[#6366f1] transition cursor-pointer"
                     >
                       <Avatar className="h-9 w-9">
                         <AvatarImage
@@ -122,7 +122,7 @@ const Navbar = () => {
                   variant="default"
                   asChild
                   size="lg"
-                  className="px-5 text-sm font-semibold bg-zinc-100 text-black hover:bg-zinc-200 transition font-sans"
+                  className="px-5 text-sm font-semibold bg-zinc-100 text-black hover:bg-zinc-200 transition font-sans cursor-pointer"
                 >
                   <Link href="/signin">Login</Link>
                 </Button>

@@ -244,7 +244,7 @@ export default function CommentSection({
         <p>{error}</p>
         <button
           onClick={fetchComments}
-          className="mt-2 px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-white text-xs font-medium"
+          className="cursor-pointer mt-2 px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-white text-xs font-medium"
         >
           Retry
         </button>
@@ -324,7 +324,7 @@ export default function CommentSection({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 p-0 text-zinc-400 hover:text-white hover:bg-transparent"
+                        className="h-7 w-7 p-0 text-zinc-400 hover:text-white hover:bg-transparent cursor-pointer"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>

@@ -67,7 +67,7 @@ export default function SignUpPage() {
           <Button
             type="button"
             variant="outline"
-            className="w-full flex items-center justify-center gap-2 bg-[#1f1f22] hover:bg-zinc-200 text-white border border-[#3a3a47] transition-colors p-5 text-md"
+            className="w-full flex items-center justify-center gap-2 bg-[#1f1f22] hover:bg-zinc-200 text-white border border-[#3a3a47] transition-colors p-5 text-md cursor-pointer"
             onClick={() => handleOAuthSignIn("google")}
             disabled={loading}
           >
@@ -180,7 +180,7 @@ export default function SignUpPage() {
           <CardFooter className="flex flex-col gap-2 mt-5">
             <Button
               type="submit"
-              className="w-fit py-5 mt-2 bg-zinc-100 hover:bg-zinc-200 border border-[#444] text-black font-semibold transition-colors duration-200 shadow-sm text-md"
+              className="w-fit py-5 mt-2 bg-zinc-100 hover:bg-zinc-200 border border-[#444] text-black font-semibold transition-colors duration-200 shadow-sm text-md cursor-pointer"
               disabled={loading}
             >
               {loading ? <Loader2 className="animate-spin mr-2" /> : ""}

@@ -177,7 +177,7 @@ export default function SingleQuestionDetails() {
         <div>
           <button
             onClick={() => router.back()}
-            className="flex items-center text-sm text-gray-400 hover:text-white transition"
+            className="flex items-center text-sm text-gray-400 hover:text-white transition cursor-pointer"
           >
             <ArrowLeftCircle className="h-4 w-4 mr-2" />
             Back to Feed
@@ -252,7 +252,7 @@ export default function SingleQuestionDetails() {
                         onClick={() =>
                           setEditTags(editTags.filter((_, i) => i !== idx))
                         }
-                        className="hover:text-white text-blue-300"
+                        className="hover:text-white text-blue-300 cursor-pointer"
                       >
                         &times;
                       </button>
@@ -264,13 +264,13 @@ export default function SingleQuestionDetails() {
               <div className="flex gap-4">
                 <Button
                   onClick={handleUpdate}
-                  className="bg-zinc-100 text-black hover:bg-zinc-200"
+                  className="bg-zinc-100 text-black hover:bg-zinc-200 cursor-pointer"
                 >
                   Save Changes
                 </Button>
                 <Button
                   variant="secondary"
-                  className="bg-red-600 hover:bg-red-700 text-white font-medium"
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium cursor-pointer"
                   onClick={() => setIsEditing(false)}
                 >
                   Cancel
@@ -314,7 +314,7 @@ export default function SingleQuestionDetails() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="p-1 h-auto w-auto text-white hover:text-white bg-[#1a1a1e] hover:bg-[#1a1a1e]"
+                        className=" cursor-pointer p-1 h-auto w-auto text-white hover:text-white bg-[#1a1a1e] hover:bg-[#1a1a1e]"
                       >
                         <MoreHorizontal className="h-5 w-5" />
                       </Button>

@@ -166,7 +166,7 @@ export default function AdminDashboard() {
         <div className="mb-10">
           <button
             onClick={() => router.back()}
-            className="flex items-center text-sm text-gray-400 hover:text-white transition"
+            className="flex items-center cursor-pointer text-sm text-gray-400 hover:text-white transition"
           >
             <ArrowLeftCircle className="h-4 w-4 mr-2" />
             Back

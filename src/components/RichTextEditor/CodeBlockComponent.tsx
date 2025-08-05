@@ -45,7 +45,7 @@ export default function CodeBlockComponent({
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="absolute top-2 right-2 bg-zinc-900 border border-zinc-700 text-zinc-300 text-sm hover:bg-zinc-800 hover:text-white transition-colors px-3 py-1 rounded"
+            className="absolute top-2 right-2 bg-zinc-900 border border-zinc-700 text-zinc-300 text-sm hover:bg-zinc-800 hover:text-white transition-colors px-3 py-1 rounded cursor-pointer"
           >
             {currentLanguage}
           </Button>

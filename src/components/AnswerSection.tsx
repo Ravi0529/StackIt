@@ -343,7 +343,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
         <p>{error}</p>
         <button
           onClick={fetchAnswers}
-          className="mt-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-white text-sm font-medium"
+          className="cursor-pointer mt-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded text-white text-sm font-medium"
         >
           Retry
         </button>
@@ -359,7 +359,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
         {!isExpanded ? (
           <Button
             variant="default"
-            className="bg-blue-600 hover:bg-blue-700 px-5 py-2 text-sm"
+            className="bg-blue-600 hover:bg-blue-700 px-5 py-2 text-sm cursor-pointer"
             onClick={() => {
               setEditingAnswer(null);
               setIsExpanded(true);
@@ -379,7 +379,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
             <div className="flex gap-3">
               <Button
                 onClick={handleSubmit}
-                className="bg-zinc-100 hover:bg-zinc-200 text-black text-sm px-4 py-2"
+                className="bg-zinc-100 hover:bg-zinc-200 text-black text-sm px-4 py-2 cursor-pointer"
                 disabled={submitting}
               >
                 {submitting
@@ -393,7 +393,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
 
               <Button
                 variant="secondary"
-                className="text-white bg-red-600 hover:bg-red-700"
+                className="text-white bg-red-600 hover:bg-red-700 cursor-pointer"
                 onClick={() => {
                   setIsExpanded(false);
                   setEditingAnswer(null);
@@ -499,7 +499,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-green-500 hover:bg-green-500/10 hover:text-green-500"
+                      className="h-8 w-8 text-green-500 hover:bg-green-500/10 hover:text-green-500 cursor-pointer"
                       onClick={() => {
                         setAnswerToModerate(answer.id);
                         setAcceptDialogOpen(true);
@@ -510,7 +510,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-red-500 hover:bg-red-500/10 hover:text-red-500"
+                      className="h-8 w-8 text-red-500 hover:bg-red-500/10 hover:text-red-500 cursor-pointer"
                       onClick={() => {
                         setAnswerToModerate(answer.id);
                         setRejectDialogOpen(true);
@@ -529,7 +529,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
 
             <div className="flex flex-wrap items-center gap-4 mt-4 text-sm">
               <button
-                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors"
+                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                 onClick={() => handleVote(answer.id, "UP")}
               >
                 <ChevronUp className="h-5 w-5" />
@@ -537,7 +537,7 @@ export default function AnswerSection({ questionId }: AnswerSectionProps) {
               </button>
 
               <button
-                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors"
+                className="flex items-center gap-1 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                 onClick={() => handleVote(answer.id, "DOWN")}
               >
                 <ChevronDown className="h-5 w-5" />

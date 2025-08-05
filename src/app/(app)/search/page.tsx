@@ -83,7 +83,7 @@ function SearchContent() {
         <div className="mb-7">
           <button
             onClick={() => router.push("/feed")}
-            className="flex items-center text-sm text-gray-400 hover:text-white transition"
+            className="flex items-center text-sm text-gray-400 hover:text-white transition cursor-pointer"
           >
             <ArrowLeftCircle className="h-4 w-4 mr-2" />
             Back to Feed
@@ -111,7 +111,10 @@ function SearchContent() {
                   className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+              <Button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              >
                 Search
               </Button>
             </div>
@@ -120,7 +123,7 @@ function SearchContent() {
               <Button
                 variant="ghost"
                 onClick={() => setSearchType("all")}
-                className={`text-sm px-3 py-1 rounded-md transition-colors ${
+                className={`text-sm px-3 py-1 rounded-md transition-colors cursor-pointer ${
                   searchType === "all"
                     ? "bg-blue-600/20 text-blue-300 hover:text-blue-300 border border-blue-500/50 hover:bg-blue-600/30"
                     : "bg-zinc-800/50 text-zinc-100 hover:text-zinc-100 hover:bg-zinc-700/50 border border-zinc-700"
@@ -131,7 +134,7 @@ function SearchContent() {
               <Button
                 variant="ghost"
                 onClick={() => setSearchType("title")}
-                className={`text-sm px-3 py-1 rounded-md transition-colors ${
+                className={`text-sm px-3 py-1 rounded-md transition-colors cursor-pointer ${
                   searchType === "title"
                     ? "bg-blue-600/20 text-blue-300 hover:text-blue-300 border border-blue-500/50 hover:bg-blue-600/30"
                     : "bg-zinc-800/50 text-zinc-100 hover:text-zinc-100 hover:bg-zinc-700/50 border border-zinc-700"
@@ -142,7 +145,7 @@ function SearchContent() {
               <Button
                 variant="ghost"
                 onClick={() => setSearchType("user")}
-                className={`text-sm px-3 py-1 rounded-md transition-colors ${
+                className={`text-sm px-3 py-1 rounded-md transition-colors cursor-pointer ${
                   searchType === "user"
                     ? "bg-blue-600/20 text-blue-300 hover:text-blue-300 border border-blue-500/50 hover:bg-blue-600/30"
                     : "bg-zinc-800/50 text-zinc-100 hover:text-zinc-100 hover:bg-zinc-700/50 border border-zinc-700"
@@ -153,7 +156,7 @@ function SearchContent() {
               <Button
                 variant="ghost"
                 onClick={() => setSearchType("tag")}
-                className={`text-sm px-3 py-1 rounded-md transition-colors ${
+                className={`text-sm px-3 py-1 rounded-md transition-colors cursor-pointer ${
                   searchType === "tag"
                     ? "bg-blue-600/20 text-blue-300 hover:text-blue-300 border border-blue-500/50 hover:bg-blue-600/30"
                     : "bg-zinc-800/50 text-zinc-100 hover:text-zinc-100 hover:bg-zinc-700/50 border border-zinc-700"
@@ -259,7 +262,7 @@ function SearchContent() {
                   variant="outline"
                   onClick={() => goToPage(page - 1)}
                   disabled={page <= 1}
-                  className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700"
+                  className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700 cursor-pointer"
                 >
                   Previous
                 </Button>
@@ -270,7 +273,7 @@ function SearchContent() {
                   variant="outline"
                   onClick={() => goToPage(page + 1)}
                   disabled={page >= totalPages}
-                  className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700"
+                  className="bg-zinc-800 border-zinc-600 text-white hover:bg-zinc-700 cursor-pointer"
                 >
                   Next
                 </Button>

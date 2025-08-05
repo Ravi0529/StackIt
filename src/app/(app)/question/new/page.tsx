@@ -62,7 +62,7 @@ export default function AskNewQuestionPage() {
         <div>
           <button
             onClick={() => router.back()}
-            className="flex items-center text-sm text-gray-400 hover:text-white transition"
+            className="flex items-center text-sm text-gray-400 hover:text-white transition cursor-pointer"
           >
             <ArrowLeftCircle className="h-4 w-4 mr-2" />
             Back to Feed
@@ -78,10 +78,10 @@ export default function AskNewQuestionPage() {
             <AlertDescription className="flex justify-between items-center">
               <span>{error}</span>
               <Button
-                variant="outline"
+                variant="default"
                 size="sm"
                 onClick={() => setError(null)}
-                className="border-white text-white hover:bg-white hover:text-black"
+                className="bg-zinc-100 text-black hover:text-black hover:bg-zinc-200 cursor-pointer"
               >
                 Dismiss
               </Button>
@@ -174,7 +174,7 @@ export default function AskNewQuestionPage() {
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-zinc-100 text-black hover:bg-zinc-200 transition font-semibold px-6 py-2"
+            className="bg-zinc-100 text-black hover:bg-zinc-200 transition font-semibold px-6 py-2 cursor-pointer"
           >
             {loading ? (
               <>
