@@ -276,7 +276,7 @@ If you have any questions or need help, please:
 
 **Made with ❤️ by the StackIt Team**
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/stackit?style=social)](https://github.com/yourusername/stackit)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/stackit?style=social)](https://github.com/yourusername/stackit)
+[![GitHub stars](https://img.shields.io/github/stars/Ravi0529/stackit?style=social)](https://github.com/Ravi0529/stackit)
+[![GitHub forks](https://img.shields.io/github/forks/Ravi0529/stackit?style=social)](https://github.com/Ravi0529/stackit)
 
 </div>
